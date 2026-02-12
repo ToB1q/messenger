@@ -1,0 +1,402 @@
+/* Контейнеры */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e6ebff 0%, #fff9f9 50%, #fdfbff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Левая часть - брендинг */
+.brandSection {
+  display: none;
+  width: 50%;
+  backdrop-filter: blur(8px);
+  padding: 3rem;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (min-width: 1024px) {
+  .brandSection {
+    display: flex;
+  }
+}
+
+.brandContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #3B82F6, #9333EA);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+}
+
+.logoText {
+  color: #fdfbff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.brandName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2563EB, #7E22CE);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero секция */
+.heroSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.heroTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1F2937;
+  line-height: 1.2;
+}
+
+.heroAccent {
+  color: #2563EB;
+}
+
+.heroDescription {
+  font-size: 1.125rem;
+  color: #4B5563;
+  line-height: 1.5;
+}
+
+/* Статистика */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding-top: 2rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin-top: 0.25rem;
+}
+
+.copyright {
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+/* Правая часть - форма */
+.formSection {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .formSection {
+    width: 50%;
+  }
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 28rem;
+  background: #FFFFFF;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(31, 41, 55, 0.08);
+  border: 1px solid #F3F4F6;
+}
+
+/* Заголовок формы */
+.formHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mobileLogo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .mobileLogo {
+    display: none;
+  }
+}
+
+.mobileLogoIcon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: linear-gradient(135deg, #3B82F6, #9333EA);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+}
+
+.mobileLogoText {
+  color: #FFFFFF;
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+.formTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 0.5rem;
+}
+
+.formSubtitle {
+  color: #6B7280;
+  font-size: 1rem;
+}
+
+/* Элементы формы */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.75rem;
+  background-color: #FAFBFF;
+  outline: none;
+  transition: all 0.2s;
+  color: #1F2937;
+  font-size: 0.95rem;
+}
+
+.input:focus {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  background-color: #FFFFFF;
+}
+
+.input::placeholder {
+  color: #94A3B8;
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* Специальные стили для телефона */
+.phoneInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.phonePrefix {
+  position: absolute;
+  left: 1rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.phoneInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.75rem;
+  background-color: #FAFBFF;
+  outline: none;
+  transition: all 0.2s;
+  color: #1F2937;
+  font-size: 0.95rem;
+}
+
+.phoneInput:focus {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  background-color: #FFFFFF;
+}
+
+.phoneInput::placeholder {
+  color: #94A3B8;
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* Забыли пароль */
+.forgotPassword {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.forgotButton {
+  font-size: 0.875rem;
+  color: #2563EB;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgotButton:hover {
+  color: #1D4ED8;
+}
+
+/* Кнопка отправки */
+.submitButton {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #2563EB, #9333EA);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);
+}
+
+.submitButton:hover {
+  background: linear-gradient(135deg, #1D4ED8, #7E22CE);
+  transform: scale(1.02);
+}
+
+/* Разделитель */
+.divider {
+  position: relative;
+  margin: 0.5rem 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #E5E7EB;
+}
+
+.dividerText {
+  position: relative;
+  background: #FFFFFF;
+  padding: 0 0.75rem;
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+/* Социальные кнопки */
+.socialButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.socialButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.75rem;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.socialButton:hover {
+  background: #FAFBFF;
+  border-color: #CBD5E1;
+}
+
+.socialIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.socialLabel {
+  font-size: 0.875rem;
+  color: #4B5563;
+}
+
+/* Переключатель режимов */
+.switchSection {
+  text-align: center;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+  border-top: 1px solid #F3F4F6;
+}
+
+.switchText {
+  color: #6B7280;
+  font-size: 0.95rem;
+}
+
+.switchButton {
+  color: #2563EB;
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 0.25rem;
+  transition: color 0.2s;
+}
+
+.switchButton:hover {
+  color: #1D4ED8;
+}
