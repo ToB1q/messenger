@@ -226,16 +226,16 @@ export default function ChatPage() {
         <div className={styles.chatsSection}>
           <div className={styles.chatsHeader}>
             <h2 className={styles.chatsTitle}>
-              <span className={styles.chatsIcon}>💬</span>
+              {/* <img className={styles.chatsIcon} src="/chat.svg" alt="" /> */}
               Чаты
             </h2>
             <button className={styles.newChatButton}>
-              <span>✏️</span>
+              <img className={styles.chatsIcon} src="/pen.png" alt="" />
             </button>
           </div>
 
           <div className={styles.chatsSearch}>
-            <span className={styles.searchIcon}>🔍</span>
+            <img className={styles.searchIcon} src="/search.svg" alt="" />
             <input 
               type="text" 
               className={styles.searchInput} 
@@ -301,13 +301,13 @@ export default function ChatPage() {
                 </div>
                 <div className={styles.chatActions}>
                   <button className={styles.chatActionButton}>
-                    <span>📞</span>
+                    <img className={styles.chatsIcon} src="/phoneCall.png" alt="" />
                   </button>
                   <button className={styles.chatActionButton}>
-                    <span>📹</span>
+                    <img className={styles.chatsIcon} src="/videoCall.svg" alt="" />
                   </button>
                   <button className={styles.chatActionButton}>
-                    <span>ℹ️</span>
+                    <img className={styles.chatsIcon} src="/menuDots.svg" alt="" />
                   </button>
                 </div>
               </div>
@@ -351,7 +351,7 @@ export default function ChatPage() {
               {/* Форма отправки сообщения */}
               <form onSubmit={handleSendMessage} className={styles.messageForm}>
                 <button type="button" className={styles.attachButton}>
-                  <span>📎</span>
+                  <img className={styles.chatsIcon} src="/clip.png" alt="" />
                 </button>
                 <input
                   type="text"
@@ -364,20 +364,20 @@ export default function ChatPage() {
                   type="button" 
                   className={styles.emojiButton}
                 >
-                  <span>😊</span>
+                  <img className={styles.chatsIcon} src="/emoji.png" alt="" />
                 </button>
                 <button 
                   type="submit" 
                   className={styles.sendButton}
                   disabled={!messageInput.trim()}
                 >
-                  <span>📤</span>
+                  <img className={styles.chatsIcon} src="/send.png" alt="" />
                 </button>
               </form>
             </>
           ) : (
             <div className={styles.noChatSelected}>
-              <div className={styles.noChatIcon}>💬</div>
+              <div className={styles.noChatIcon}><img className={styles.chatsIcon} src="/chat.svg" alt="" /></div>
               <h3 className={styles.noChatTitle}>Выберите чат</h3>
               <p className={styles.noChatText}>Начните общение с друзьями</p>
             </div>

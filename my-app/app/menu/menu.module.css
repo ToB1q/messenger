@@ -1,0 +1,577 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e6ebff 0%, #fff9f9 50%, #fdfbff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Основной контент */
+.content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 1.5rem;
+}
+
+/* Левая колонка - профиль */
+.profileSection {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: fit-content;
+}
+
+/* Шапка профиля */
+.profileHeader {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.profileAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.2);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0;
+}
+
+.verifiedBadge {
+  color: #2563EB;
+  font-size: 1rem;
+}
+
+.profileContact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.phone {
+  font-size: 0.875rem;
+  color: #4B5563;
+}
+
+.username {
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+/* Кнопка редактирования */
+.editButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 1rem;
+  color: #2563EB;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.editButton:hover {
+  background: rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.editIcon {
+  font-size: 1rem;
+}
+
+/* Статистика */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 1rem;
+  transition: all 0.2s;
+}
+
+.statItem:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.05);
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: #6B7280;
+}
+
+/* Premium баннер */
+.premiumBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  border-radius: 1rem;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.premiumBanner:hover {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
+  transform: translateY(-2px);
+}
+
+.premiumContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.premiumIcon {
+  font-size: 1.5rem;
+}
+
+.premiumText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.premiumTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.premiumSubtitle {
+  font-size: 0.75rem;
+  color: #6B7280;
+}
+
+.premiumButton {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  color: #2563EB;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.premiumButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* Навигационное меню */
+.navMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  background: transparent;
+  border: none;
+  border-radius: 1rem;
+  color: #1F2937;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.7);
+  transform: translateX(4px);
+}
+
+.navIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.navLabel {
+  flex: 1;
+  font-weight: 500;
+}
+
+.navArrow {
+  color: #9CA3AF;
+  font-size: 1rem;
+}
+
+/* Правая колонка - меню */
+.menuSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.menuHeader {
+  margin-bottom: 0.5rem;
+}
+
+.menuTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0;
+}
+
+/* Сетка карточек меню */
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.menuCard {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  padding: 1.5rem;
+  transition: all 0.2s;
+}
+
+.menuCard:hover {
+  background: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.menuCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.menuCardIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.menuCardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0;
+}
+
+.menuCardItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menuCardItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.75rem;
+  color: #4B5563;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.menuCardItem:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563EB;
+  padding-left: 0.75rem;
+}
+
+.menuCardArrow {
+  color: #9CA3AF;
+  font-size: 0.875rem;
+}
+
+.menuCardValue {
+  color: #6B7280;
+  font-size: 0.813rem;
+  background: rgba(0, 0, 0, 0.02);
+  padding: 0.125rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.menuCardCount {
+  color: #6B7280;
+  font-size: 0.813rem;
+  font-weight: 500;
+  background: rgba(59, 130, 246, 0.08);
+  padding: 0.125rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.logoutButton {
+  color: #DC2626;
+  margin-top: 0.5rem;
+}
+
+.logoutButton:hover {
+  background: rgba(220, 38, 38, 0.08);
+  color: #DC2626;
+}
+
+/* Нижняя навигация (для мобильных) */
+.bottomNav {
+  display: none;
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  background: white;
+  backdrop-filter: blur(8px);
+  border-radius: 2rem;
+  padding: 0.5rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.bottomNavItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 1.5rem;
+  color: #6B7280;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bottomNavItem.active {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563EB;
+}
+
+.bottomNavIcon {
+  font-size: 1.25rem;
+}
+
+/* Адаптация для планшетов */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 300px 1fr;
+    padding: 1rem;
+  }
+  
+  .menuGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+    padding: 1rem 1rem 5rem 1rem;
+  }
+
+  .profileSection {
+    width: 100%;
+  }
+
+  .menuGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .bottomNav {
+    display: flex;
+  }
+
+  .profileHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profileInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profileName {
+    justify-content: center;
+  }
+
+  .profileContact {
+    align-items: center;
+  }
+
+  .statsGrid {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .menuCard {
+    padding: 1.25rem;
+  }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profileSection,
+.menuCard {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Стили для скроллбара */
+.menuSection::-webkit-scrollbar {
+  width: 4px;
+}
+
+.menuSection::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 4px;
+}
+
+.menuSection::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+/* Дополнительные улучшения */
+.premiumBanner {
+  position: relative;
+  overflow: hidden;
+}
+
+.premiumBanner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.premiumBanner:hover::after {
+  left: 100%;
+}
+
+/* Статус онлайн/офлайн */
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #10B981;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  background: #10B981;
+  border-radius: 50%;
+}
+
+/* Иконки с градиентом */
+.gradientIcon {
+  background: linear-gradient(135deg, #2563EB, #9333EA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

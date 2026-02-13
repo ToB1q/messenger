@@ -32,7 +32,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
+  padding: 0.85rem 1rem;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
@@ -46,7 +46,8 @@
 }
 
 .chatsIcon {
-  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .newChatButton {
@@ -70,7 +71,7 @@
 
 .chatsSearch {
   position: relative;
-  padding: 1rem 1.5rem;
+  padding: 0.85rem 1rem;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
@@ -79,8 +80,9 @@
   left: 2rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9CA3AF;
-  font-size: 1rem;
+  color: #9CA3AF; 
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .searchInput {
@@ -250,7 +252,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
@@ -404,7 +406,7 @@
 }
 
 .theirMessage .messageBubble {
-  background: white;
+  background: #fbf7ff;
   color: #1F2937;
   border-bottom-left-radius: 0.25rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
@@ -419,8 +421,8 @@
 .messageTime {
   font-size: 0.688rem;
   position: absolute;
-  bottom: 0.5rem;
-  right: 0.75rem;
+  bottom: 0.01rem;
+  right: 0.7rem;
   opacity: 0.7;
   display: flex;
   align-items: center;
