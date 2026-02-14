@@ -172,22 +172,6 @@ export default function MenuPage() {
               </div>
             </div>
           </div>
-
-          {/* Нижняя навигация (мобильная) */}
-          <div className={styles.bottomNav}>
-            <button className={`${styles.bottomNavItem} ${activeTab === 'feed' ? styles.active : ''}`}>
-              <span className={styles.bottomNavIcon}>📱</span>
-              <span className={styles.bottomNavLabel}>Лента</span>
-            </button>
-            <button className={`${styles.bottomNavItem} ${activeTab === 'chats' ? styles.active : ''}`}>
-              <span className={styles.bottomNavIcon}>💬</span>
-              <span className={styles.bottomNavLabel}>Чаты</span>
-            </button>
-            <button className={`${styles.bottomNavItem} ${activeTab === 'menu' ? styles.active : ''}`}>
-              <span className={styles.bottomNavIcon}>☰</span>
-              <span className={styles.bottomNavLabel}>Меню</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>

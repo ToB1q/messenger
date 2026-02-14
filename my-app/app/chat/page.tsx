@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/app/components/layout/Header';
 import styles from './chat.module.css';
 
@@ -31,6 +31,9 @@ interface Message {
 export default function ChatPage() {
   const [selectedChat, setSelectedChat] = useState<number | null>(1);
   const [messageInput, setMessageInput] = useState('');
+  const [isMobileDialogOpen, setIsMobileDialogOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+  
   const [chats, setChats] = useState<Chat[]>([
     {
       id: 1,
@@ -183,6 +186,18 @@ export default function ChatPage() {
     },
   ]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      if (window.innerWidth > 768) {
+        setIsMobileDialogOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || !selectedChat) return;
@@ -214,6 +229,17 @@ export default function ChatPage() {
     ));
   };
 
+  const handleChatSelect = (chatId: number) => {
+    setSelectedChat(chatId);
+    if (windowWidth <= 768) {
+      setIsMobileDialogOpen(true);
+    }
+  };
+
+  const handleBackToChats = () => {
+    setIsMobileDialogOpen(false);
+  };
+
   const selectedChatData = chats.find(chat => chat.id === selectedChat);
   const chatMessages = messages.filter(msg => msg.chatId === selectedChat);
 
@@ -223,10 +249,9 @@ export default function ChatPage() {
       
       <div className={styles.content}>
         {/* Левая колонка - список чатов */}
-        <div className={styles.chatsSection}>
+        <div className={`${styles.chatsSection} ${isMobileDialogOpen ? styles.hideOnMobile : ''}`}>
           <div className={styles.chatsHeader}>
             <h2 className={styles.chatsTitle}>
-              {/* <img className={styles.chatsIcon} src="/chat.svg" alt="" /> */}
               Чаты
             </h2>
             <button className={styles.newChatButton}>
@@ -247,8 +272,8 @@ export default function ChatPage() {
             {chats.map((chat) => (
               <button
                 key={chat.id}
-                className={`${styles.chatItem} ${selectedChat === chat.id ? styles.active : ''}`}
-                onClick={() => setSelectedChat(chat.id)}
+                className={`${styles.chatItem} ${selectedChat === chat.id && !isMobileDialogOpen ? styles.active : ''}`}
+                onClick={() => handleChatSelect(chat.id)}
               >
                 <div className={styles.chatAvatarWrapper}>
                   <img className={styles.chatAvatar} src={chat.avatar} alt={chat.username} />
@@ -278,11 +303,14 @@ export default function ChatPage() {
         </div>
 
         {/* Правая колонка - переписка */}
-        <div className={styles.messagesSection}>
+        <div className={`${styles.messagesSection} ${isMobileDialogOpen ? styles.showOnMobile : ''}`}>
           {selectedChatData ? (
             <>
               {/* Шапка чата */}
               <div className={styles.messagesHeader}>
+                <div className={styles.mobileBackButton} onClick={handleBackToChats}>
+                  <img className={styles.chatsIcon} src="/back.svg" alt="Назад" />
+                </div>
                 <div className={styles.chatUserInfo}>
                   <div className={styles.chatUserAvatarWrapper}>
                     <img 
