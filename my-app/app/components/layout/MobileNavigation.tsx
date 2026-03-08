@@ -1,12 +1,15 @@
+// components/layout/MobileNavigation.tsx
 "use client";
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTheme } from '@/app/context/ThemeContext';
 
 export default function MobileNavigation() {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -19,7 +22,11 @@ export default function MobileNavigation() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  if (!isMobile || pathname === '/auth') return null;
+  // Список путей, где НЕ нужно показывать навигацию
+  const noNavPaths = ['/auth', '/login', '/register', '/'];
+  
+  // Не показываем навигацию на страницах авторизации или когда открыт чат
+  if (!isMobile || noNavPaths.includes(pathname) || pathname?.startsWith('/chat/')) return null;
 
   return (
     <div className="mobileBottomNav">
@@ -28,7 +35,7 @@ export default function MobileNavigation() {
         <span className="mobileNavLabel">Лента</span>
       </Link>
       <Link href="/chat" className={`mobileNavItem ${pathname === '/chat' || pathname?.startsWith('/chat/') ? 'active' : ''}`}>
-        <img src="/chat.svg" alt="Чаты" className="mobileNavIcon" />
+        <img src={theme === 'light' ? '/chat.svg' : '/chat-dark.svg'} alt="Чаты" className="mobileNavIcon" />
         <span className="mobileNavLabel">Чаты</span>
       </Link>
       <Link href="/menu" className={`mobileNavItem ${pathname === '/menu' ? 'active' : ''}`}>

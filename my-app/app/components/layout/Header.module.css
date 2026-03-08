@@ -2,9 +2,9 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--bg-nav);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .headerContent {
@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex-shrink: 0; /* Запрещаем сжиматься */
+  flex-shrink: 0;
 }
 
 .logo {
@@ -37,10 +37,9 @@
 }
 
 .logoIcon {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, #2563EB, #9333EA);
-  border-radius: 0.75rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,7 +55,7 @@
 .brandName {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   display: none;
 }
 
@@ -67,7 +66,7 @@
 }
 
 .separator {
-  color: #D1D5DB;
+  color: #a6a8ad;
   font-weight: 300;
   margin-left: 0.25rem;
   display: none;
@@ -82,7 +81,7 @@
 .pageTitle {
   font-size: 1.25rem;
   font-weight: 500;
-  color: #4B5563;
+  color: var(--text-secondary);
   display: none;
 }
 
@@ -97,7 +96,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-shrink: 0; /* Запрещаем сжиматься */
+  flex-shrink: 0;
 }
 
 /* Поиск */
@@ -116,7 +115,7 @@
   border: none;
   background: transparent;
   border-radius: 0.75rem;
-  color: #4B5563;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -142,10 +141,10 @@
   top: 100%;
   margin-top: 0.5rem;
   width: 280px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 1rem;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  border: 1px solid var(--border-color);
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -167,23 +166,23 @@
 .searchInput {
   flex: 1;
   padding: 0.625rem 1rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid var(--border-input);
   border-radius: 0.75rem;
-  background: #FAFBFF;
+  background: var(--bg-card);
   outline: none;
   transition: all 0.2s;
   font-size: 0.875rem;
-  color: #1F2937;
+  color: var(--text-primary);
 }
 
 .searchInput:focus {
   border-color: #2563EB;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-  background: white;
+  background: var(--bg-card);
 }
 
 .searchInput::placeholder {
-  color: #94A3B8;
+  color: var(--text-muted);
 }
 
 .clearButton {
@@ -207,12 +206,12 @@
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* Навигация */
+/* Навигация для десктопа */
 .nav {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  background: rgba(243, 244, 246, 0.5);
+  background: var(--bg-nav);
   padding: 0.25rem;
   border-radius: 1.5rem;
   backdrop-filter: blur(4px);
@@ -225,19 +224,19 @@
   padding: 0.5rem 1rem;
   border-radius: 1.25rem;
   text-decoration: none;
-  color: #6B7280;
+  color: var(--text-tertiary);
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .navItem:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-secondary);
   color: #2563EB;
 }
 
 .navItem.active {
-  background: white;
+  background: var(--bg-card);
   color: #2563EB;
   box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
 }
@@ -248,21 +247,7 @@
 }
 
 .navLabel {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .navLabel {
-    display: none;
-  }
-  .nav {
-    position: static; /* Возвращаем в поток */
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
-    box-shadow: none;
-    border: none;
-  }
+  display: inline; /* Показываем лейблы на десктопе */
 }
 
 /* Профиль */
@@ -270,7 +255,7 @@
   text-decoration: none;
 }
 
-.avatar {
+/* .avatar {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
@@ -288,23 +273,23 @@
   border-color: #2563EB;
   transform: scale(1.05);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
+} */
 
-/* Исправленная адаптация для мобильных */
+/* Адаптация для мобильных */
 @media (max-width: 768px) {
   .header {
-    position: relative; /* Убираем sticky на мобильных */
+    position: relative;
   }
 
   .headerContent {
     padding: 0.5rem 1rem;
-    flex-wrap: wrap; /* Разрешаем перенос */
+    flex-wrap: wrap;
     gap: 0.5rem;
   }
 
   .leftSection {
     flex: 1;
-    min-width: 0; /* Позволяем сжиматься */
+    min-width: 0;
   }
 
   .rightSection {
@@ -320,35 +305,12 @@
     font-size: 1rem;
   }
 
-  /* .brandName,
-  .separator,
-  .pageTitle {
-    display: none; 
-  } */
-
-  /* Убираем фиксированное позиционирование навигации */
+  /* Скрываем навигацию в шапке на мобильных */
   .nav {
-    position: static; /* Возвращаем в поток */
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
-    box-shadow: none;
-    border: none;
+    display: none; /* Полностью скрываем навигацию в шапке на мобильных */
   }
 
-  .navItem {
-    padding: 0.375rem;
-  }
-
-  .navIcon {
-    display: none;
-  }
-
-  .navLabel {
-    display: none;
-  }
-
-  /* Стили для нижней навигации добавляем отдельно в layout */
+  /* Стили для поиска на мобильных */
   .searchForm {
     position: fixed;
     left: 1rem;
@@ -368,7 +330,7 @@
     height: 1.125rem;
   }
 
-  /* Убираем аватар на мобильных если нужно */
+  /* Скрываем аватар на мобильных */
   .profileLink {
     display: none;
   }
@@ -384,12 +346,58 @@
     gap: 0.25rem;
   }
 
-  .navItem {
-    padding: 0.25rem;
-  }
-
   .iconButton {
     width: 1.75rem;
     height: 1.75rem;
   }
 }
+
+/* Кнопка переключения темы */
+.themeButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.themeButton:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-primary);
+}
+
+.themeIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  filter: var(--icon-filter, none);
+}
+
+.dark .themeIcon {
+  filter: brightness(0.8) invert(0.2);
+}
+
+@media (max-width: 768px) {
+  .themeButton {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .themeIcon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .themeButton {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+

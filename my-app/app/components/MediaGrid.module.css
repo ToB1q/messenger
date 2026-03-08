@@ -1,0 +1,362 @@
+/* app/components/MediaGrid.module.css */
+.mediaContainer {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Стили для своих сообщений */
+.mediaContainer.myMessage {
+  background: var(--my-message-bg);
+}
+
+.mediaContainer.theirMessage {
+  background: var(--their-message-bg);
+}
+
+.mediaGrid {
+  display: grid;
+  gap: 2px;
+  background: inherit;
+  position: relative;
+}
+
+/* 1 фото */
+.grid1 {
+  grid-template-columns: 1fr;
+}
+
+.grid1 .gridItem {
+  aspect-ratio: auto;
+  max-height: 400px;
+}
+
+/* 2 фото */
+.grid2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid2 .gridItem {
+  aspect-ratio: auto;
+  height: 200px;
+}
+
+/* 3 фото */
+.grid3 {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.itemLarge {
+  grid-row: span 2;
+  aspect-ratio: auto;
+  height: 400px;
+}
+
+.itemSmall {
+  aspect-ratio: auto;
+  height: 198px;
+}
+
+/* 4 фото */
+.grid4 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+}
+
+.grid4 .gridItem {
+  aspect-ratio: auto;
+  height: 200px;
+}
+
+/* 5 фото */
+.grid5 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.grid5 .gridItem {
+  flex: 1 1 calc(33.333% - 2px);
+  aspect-ratio: auto;
+  height: 150px;
+}
+
+.grid5 .itemHalf {
+  flex: 1 1 calc(50% - 2px);
+  height: 200px;
+}
+
+/* 6 фото */
+.grid6 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.grid6 .gridItem {
+  flex: 1 1 calc(33.333% - 2px);
+  aspect-ratio: auto;
+  height: 150px;
+}
+
+/* 7 фото */
+.grid7 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.grid7 .gridItem {
+  flex: 1 1 calc(25% - 2px);
+  aspect-ratio: auto;
+  height: 130px;
+}
+
+.grid7 .itemDouble {
+  flex: 1 1 calc(50% - 2px);
+  height: 260px;
+}
+
+/* 8 фото */
+.grid8 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.grid8 .gridItem {
+  flex: 1 1 calc(25% - 2px);
+  aspect-ratio: auto;
+  height: 130px;
+}
+
+/* 9 фото */
+.grid9 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.grid9 .gridItem {
+  flex: 1 1 calc(33.333% - 2px);
+  aspect-ratio: auto;
+  height: 140px;
+}
+
+/* 10+ фото */
+.gridMany {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.gridMany .gridItem {
+  flex: 1 1 calc(33.333% - 2px);
+  aspect-ratio: auto;
+  height: 140px;
+}
+
+/* Общие стили для всех элементов */
+.gridItem {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-secondary);
+}
+
+.mediaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mediaImage.loaded {
+  opacity: 1;
+}
+
+.mediaVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mediaPlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+}
+
+.videoBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  z-index: 2;
+}
+
+/* ===== СТИЛИ ДЛЯ ПОДПИСИ ===== */
+.captionContainer {
+  padding: 8px 12px;
+  position: relative;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.myMessage .captionContainer {
+  background: var(--my-message-bg);
+}
+
+.myMessage .captionText {
+  color: white;
+}
+
+.theirMessage .captionContainer {
+  background: var(--their-message-bg);
+}
+
+.theirMessage .captionText {
+  color: var(--text-primary);
+}
+
+.captionText {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-right: 50px;
+  word-break: break-word;
+}
+
+.captionTime {
+  font-size: 0.688rem;
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.myMessage .captionTime {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.theirMessage .captionTime {
+  color: var(--text-tertiary);
+}
+
+/* ===== СТИЛИ ДЛЯ ВРЕМЕНИ ПОВЕРХ ФОТО ===== */
+.timeOverlay {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.timeOverlayText {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: white;
+  font-weight: 500;
+}
+
+.timeOverlay .messageStatus {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1); /* Делает иконку белой */
+}
+
+/* Статус сообщения */
+.messageStatus {
+  width: 14px;
+  height: 14px;
+}
+
+/* Скругления для медиа-контейнера */
+.myMessage .mediaContainer {
+  border-bottom-right-radius: 0.25rem;
+}
+
+.theirMessage .mediaContainer {
+  border-bottom-left-radius: 0.25rem;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 480px) {
+  .mediaGrid {
+    max-width: 100%;
+  }
+  
+  .grid3 {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .itemLarge {
+    grid-column: span 2;
+  }
+  
+  .grid1 .gridItem {
+    max-height: 300px;
+  }
+  
+  .grid2 .gridItem {
+    height: 150px;
+  }
+  
+  .grid3 .itemLarge {
+    height: 300px;
+  }
+  
+  .grid3 .itemSmall {
+    height: 148px;
+  }
+  
+  .grid4 .gridItem {
+    height: 150px;
+  }
+  
+  .grid5 .gridItem,
+  .grid6 .gridItem,
+  .grid7 .gridItem,
+  .grid8 .gridItem,
+  .grid9 .gridItem,
+  .gridMany .gridItem {
+    height: 100px;
+  }
+  
+  .timeOverlay {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+}

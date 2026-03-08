@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e6ebff 0%, #fff9f9 50%, #fdfbff 100%);
+  background: var(--bg-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -16,16 +16,16 @@
 
 /* Левая колонка - профиль */
 .profileSection {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   border-radius: 1.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  border: 1px solid var(--border-color);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  height: fit-content;
+  height: 100%;
 }
 
 /* Шапка профиля */
@@ -39,11 +39,11 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid white;
+  border: 1px solid var(--border-color);
   box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.2);
   overflow: hidden;
   flex-shrink: 0;
@@ -70,7 +70,7 @@
 .name {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -87,12 +87,12 @@
 
 .phone {
   font-size: 0.875rem;
-  color: #4B5563;
+  color: var(--text-secondary);
 }
 
 .username {
   font-size: 0.875rem;
-  color: #6B7280;
+  color: var(--text-tertiary);
 }
 
 /* Кнопка редактирования */
@@ -136,26 +136,24 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.5);
   border-radius: 1rem;
   transition: all 0.2s;
 }
 
 .statItem:hover {
-  background: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.067);
 }
 
 .statValue {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
 }
 
 .statLabel {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--text-tertiary);
 }
 
 /* Premium баннер */
@@ -195,12 +193,12 @@
 .premiumTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
 }
 
 .premiumSubtitle {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--text-tertiary);
 }
 
 .premiumButton {
@@ -240,7 +238,7 @@
   background: transparent;
   border: none;
   border-radius: 1rem;
-  color: #1F2937;
+  color: var(--text-primary);
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -249,7 +247,6 @@
 }
 
 .navItem:hover {
-  background: rgba(255, 255, 255, 0.7);
   transform: translateX(4px);
 }
 
@@ -283,7 +280,7 @@
 .menuTitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -296,17 +293,16 @@
 }
 
 .menuCard {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   border-radius: 1.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  border: 1px solid var(--border-color);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
   padding: 1.5rem;
   transition: all 0.2s;
 }
 
 .menuCard:hover {
-  background: white;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
   transform: translateY(-2px);
 }
@@ -317,7 +313,7 @@
   gap: 0.5rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .menuCardIcon {
@@ -328,7 +324,7 @@
 .menuCardTitle {
   font-size: 1rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -346,7 +342,7 @@
   background: transparent;
   border: none;
   border-radius: 0.75rem;
-  color: #4B5563;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -365,7 +361,7 @@
 }
 
 .menuCardValue {
-  color: #6B7280;
+  color: var(--text-tertiary);
   font-size: 0.813rem;
   background: rgba(0, 0, 0, 0.02);
   padding: 0.125rem 0.5rem;
@@ -373,7 +369,7 @@
 }
 
 .menuCardCount {
-  color: #6B7280;
+  color: var(--text-tertiary);
   font-size: 0.813rem;
   font-weight: 500;
   background: rgba(59, 130, 246, 0.08);
@@ -389,47 +385,6 @@
 .logoutButton:hover {
   background: rgba(220, 38, 38, 0.08);
   color: #DC2626;
-}
-
-/* Нижняя навигация (для мобильных) */
-.bottomNav {
-  display: none;
-  position: fixed;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
-  background: white;
-  backdrop-filter: blur(8px);
-  border-radius: 2rem;
-  padding: 0.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-}
-
-.bottomNavItem {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  background: transparent;
-  border: none;
-  border-radius: 1.5rem;
-  color: #6B7280;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.bottomNavItem.active {
-  background: rgba(59, 130, 246, 0.1);
-  color: #2563EB;
-}
-
-.bottomNavIcon {
-  font-size: 1.25rem;
 }
 
 /* Адаптация для планшетов */
@@ -526,52 +481,51 @@
   border-radius: 4px;
 }
 
-/* Дополнительные улучшения */
-.premiumBanner {
-  position: relative;
-  overflow: hidden;
-}
-
-.premiumBanner::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.premiumBanner:hover::after {
-  left: 100%;
-}
-
-/* Статус онлайн/офлайн */
-.statusIndicator {
+/* Кнопка переключения темы */
+.themeButton {
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  color: #10B981;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.statusDot {
-  width: 6px;
-  height: 6px;
-  background: #10B981;
-  border-radius: 50%;
+.themeButton:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-primary);
 }
 
-/* Иконки с градиентом */
-.gradientIcon {
-  background: linear-gradient(135deg, #2563EB, #9333EA);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.themeIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  filter: var(--icon-filter, none);
+}
+
+.dark .themeIcon {
+  filter: brightness(0.8) invert(0.2);
+}
+
+@media (max-width: 768px) {
+  .themeButton {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .themeIcon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .themeButton {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
 }

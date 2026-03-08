@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '@/app/context/ThemeContext';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -11,6 +12,7 @@ interface HeaderProps {
 
 export default function Header({ title }: HeaderProps) {
   const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [pageTitle, setPageTitle] = useState('');
@@ -70,10 +72,8 @@ export default function Header({ title }: HeaderProps) {
         {/* Левая часть - логотип и название страницы */}
         <div className={styles.leftSection}>
           <Link href="/feed" className={styles.logo}>
-            <div className={styles.logoIcon}>
-              <span className={styles.logoText}>M</span>
-            </div>
-            <span className={styles.brandName}>Messenger</span>
+              <img className={styles.logoIcon} src="/Logo.jpg" alt="" />
+            <span className={styles.brandName}>Phoenix</span>
           </Link>
           
           {pageTitle && (
@@ -86,6 +86,19 @@ export default function Header({ title }: HeaderProps) {
 
         {/* Правая часть - навигация и действия */}
         <div className={styles.rightSection}>
+          {/* Кнопка переключения темы */}
+          {/* <button 
+            className={styles.themeButton}
+            onClick={toggleTheme}
+            aria-label="Переключить тему"
+          >
+            <img 
+              src={theme === 'light' ? '/moon.svg' : '/sun.svg'} 
+              alt={theme === 'light' ? 'Темная тема' : 'Светлая тема'}
+              className={styles.themeIcon}
+            />
+          </button> */}
+
           {/* Поиск */}
           <div className={styles.searchContainer}>
             <button 
@@ -130,10 +143,10 @@ export default function Header({ title }: HeaderProps) {
             </Link>
             
             <Link 
-              href="chat/" 
+              href="/chat" 
               className={`${styles.navItem} ${pathname === '/chat' || pathname?.startsWith('/chat/') ? styles.active : ''}`}
             >
-              <img src="/chat.svg" alt="" className={styles.navIcon}/>
+              <img src={theme === 'light' ? '/chat.svg' : '/chat-dark.svg'} alt="" className={styles.navIcon}/>
               <span className={styles.navLabel}>Чаты</span>
             </Link>
             

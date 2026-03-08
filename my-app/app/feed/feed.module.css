@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e6ebff 0%, #fff9f9 50%, #fdfbff 100%);
+  background: var( --bg-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -20,12 +20,12 @@
 }
 
 .storiesWrapper {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   border-radius: 1.5rem;
   padding: 1.25rem 1.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px var(--shadow-sm);
 }
 
 .storiesHeader {
@@ -41,7 +41,7 @@
   gap: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
 }
 
 .showAllButton {
@@ -106,7 +106,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--bg-card);
   transition: transform 0.2s;
 }
 
@@ -115,7 +115,7 @@
 }
 
 .storyNew {
-  background: linear-gradient(135deg, #2563EB, #9333EA);
+  background: var(--accent-gradient);
   padding: 2px;
 }
 
@@ -123,11 +123,11 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: white;
+  background: var(--bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  border: 2px solid var(--bg-card);
 }
 
 .storyAvatarEmoji {
@@ -147,13 +147,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  border: 2px solid var(--bg-card);
   font-size: 0.875rem;
 }
 
 .storyUsername {
   font-size: 0.75rem;
-  color: #4B5563;
+  color: var(--text-secondary);
   max-width: 72px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -161,7 +161,7 @@
 }
 
 .viewedStory {
-  color: #94A3B8;
+  color: var(--text-muted);
 }
 
 /* Лента постов */
@@ -173,17 +173,18 @@
 }
 
 .post {
-  background: white;
+  background: var(--bg-card);
   border-radius: 1.5rem;
   padding: 1.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
   transition: box-shadow 0.2s;
   width: 100%;
+  color: var(--text-primary);
 }
 
 .post:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-md);
 }
 
 .postHeader {
@@ -203,7 +204,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e6ebff 0%, #fdfbff 100%);
+  background: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,13 +220,13 @@
 
 .postUsername {
   font-weight: 600;
-  color: #1F2937;
+   color: var(--text-primary);
   font-size: 0.95rem;
 }
 
 .postTime {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--text-tertiary);
 }
 
 .postMenuButton {
@@ -249,7 +250,7 @@
 }
 
 .postText {
-  color: #1F2937;
+  color: var(--text-tertiary);
   line-height: 1.5;
   margin-bottom: 1rem;
   font-size: 0.95rem;
@@ -260,7 +261,7 @@
   width: 100%;
   border-radius: 1rem;
   overflow: hidden;
-  background: linear-gradient(135deg, #f1f5ff 0%, #fff5f5 100%);
+  background: var(--post-image);
   border: 1px solid rgba(59, 130, 246, 0.1);
 }
 
@@ -269,7 +270,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f1f5ff 0%, #fff5f5 100%);
+  background: var(--post-image);
   min-height: 200px;
   max-height: 500px;
 }
@@ -288,7 +289,7 @@
   align-items: center;
   justify-content: space-between;
   padding-top: 1rem;
-  border-top: 1px solid #F3F4F6;
+  border-top: 1px solid var(--border-input);
 }
 
 .postActionButtons {
@@ -303,7 +304,7 @@
   gap: 0.375rem;
   background: none;
   border: none;
-  color: #6B7280;
+  color: var(--text-tertiary);
   font-size: 0.875rem;
   cursor: pointer;
   padding: 0.375rem 0.75rem;
@@ -339,7 +340,7 @@
 .saveButton {
   background: none;
   border: none;
-  color: #6B7280;
+  color: var(--text-tertiary);
   font-size: 1.125rem;
   cursor: pointer;
   padding: 0.375rem;
@@ -358,14 +359,14 @@
   gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #F3F4F6;
+  border-top: 1px solid var(--border-input);
 }
 
 .commentAvatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e6ebff 0%, #fdfbff 100%);
+  background: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -376,23 +377,23 @@
 .commentInput {
   flex: 1;
   padding: 0.625rem 1rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid var(--border-input);
   border-radius: 1.5rem;
-  background: #FAFBFF;
+  background: var(--bg-input);
   outline: none;
   transition: all 0.2s;
   font-size: 0.875rem;
-  color: #1F2937;
+  color: var(--text-primary);
 }
 
 .commentInput:focus {
   border-color: #2563EB;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-  background: white;
+  background: var(--bg-input);
 }
 
 .commentInput::placeholder {
-  color: #94A3B8;
+   color: var(--text-muted);
 }
 
 .commentSendButton {
@@ -627,3 +628,4 @@
   display: flex;
   align-items: center;    
 }
+

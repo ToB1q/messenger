@@ -1,8 +1,83 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Светлая тема (по умолчанию) */
+  --bg-primary: linear-gradient(135deg, #e6ebff 0%, #fff9f9 50%, #fdfbff 100%);
+  --bg-secondary: rgba(255, 255, 255, 0.7);
+  --bg-card: white;
+  --bg-input: #FAFBFF;
+  --bg-nav: rgba(243, 244, 246, 0.5);
+  --bg-premium:linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-tertiary: #6B7280;
+  --text-muted: #94A3B8;
+  
+  --border-color: rgba(229, 231, 235, 0.5);
+  --border-input: #E5E7EB;
+  
+  --accent-primary: #2563EB;
+  --accent-secondary: #9333EA;
+  --accent-gradient: linear-gradient(135deg, #2563EB, #9333EA);
+  
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 25px 50px -12px rgba(31, 41, 55, 0.08);
+  
+  --online-indicator: #10B981;
+  --unread-badge: #2563EB;
+  --my-message-bg: #2563EB;
+  --their-message-bg: #fbf7ff;
+
+  --post-image: linear-gradient(135deg, #f1f5ff 0%, #fff5f5 100%);
+  --chat-scrollbar-track: #FAFBFF;
+  --chat-scrollbar-thumb: #CBD5E1;
+  --chat-item-hover: rgba(59, 130, 246, 0.045);
+  --bg-image: url('/TG-pattern-Light.png');
+  --opacity-bg-image: 0.155;
+  --chat-header-color: rgba(255, 255, 255, 1);
+  --border-color-chat:rgba(229, 231, 235, 1rem);
+}
+
+/* Темная тема */
+.dark {
+  --bg-primary: linear-gradient(135deg, #1a1f2e 0%, #1e1a2a 50%, #1a1f2f 100%);
+  --bg-secondary: rgba(30, 35, 48, 0.8);
+  --bg-card: #262b3c;
+  --bg-input: #2d3347;
+  --bg-nav: rgba(34, 39, 50, 0.8);
+  
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
+  --text-tertiary: #6B7280;
+  --text-muted: #4B5563;
+  
+  --border-color: rgba(55, 65, 81, 0.5);
+  --border-input: #374151;
+  
+  --accent-primary: #3B82F6;
+  --accent-secondary: #A855F7;
+  --accent-gradient: linear-gradient(135deg, #3B82F6, #A855F7);
+  
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  
+  --online-indicator: #34D399;
+  --unread-badge: #26549d;
+  --my-message-bg: #26549d;
+  --their-message-bg: #2d3347;
+
+  --post-image: linear-gradient(135deg, #1a1f2e 0%, #171129 100%);
+  --chat-scrollbar-track: #1a1f2e;
+  --chat-scrollbar-thumb: #131722;
+  --chat-item-hover: rgba(59, 131, 246, 0.035);
+  --bg-image: url('/TG-pattern-Dark.png');
+  --opacity-bg-image: 0.2;
+  --chat-header-color:rgba(30, 35, 48, 1);
+  --border-color-chat:rgba(55, 65, 81, 1);
+
 }
 
 @theme inline {
@@ -19,10 +94,14 @@
   }
 }
 
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* Мобильная нижняя навигация */
@@ -34,12 +113,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background: white;
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   border-radius: 2rem;
   padding: 0.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
   z-index: 100;
 }
 
@@ -52,19 +131,24 @@ body {
   padding: 0.5rem;
   border-radius: 1.5rem;
   text-decoration: none;
-  color: #6B7280;
+  color: var(--text-tertiary);
   font-size: 0.75rem;
   transition: all 0.2s;
 }
 
 .mobileNavItem.active {
   background: rgba(59, 130, 246, 0.1);
-  color: #2563EB;
+  color: var(--accent-primary);
 }
 
 .mobileNavIcon {
   width: 1.5rem;
   height: 1.5rem;
+  filter: var(--icon-filter, none);
+}
+
+.dark .mobileNavIcon {
+  filter: brightness(0.8) invert(0.2);
 }
 
 .mobileNavLabel {
@@ -77,4 +161,41 @@ body {
   body {
     padding-bottom: 5rem;
   }
+}
+
+/* Стили для скроллбара в темной теме */
+.dark ::-webkit-scrollbar-track {
+  background: #2d3347;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4B5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
+/* Добавьте в конец файла globals.css */
+
+/* Скрытие нижней навигации при открытом чате */
+body.chat-open .mobileBottomNav {
+  display: none !important;
+}
+
+/* Корректировка отступа для контента при открытом чате */
+body.chat-open {
+  padding-bottom: 0 !important;
+}
+
+/* Убедимся, что форма ввода всегда видна */
+.messagesSection.showOnMobile {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.messagesSection.showOnMobile .messageForm {
+  flex-shrink: 0;
+  position: relative;
+  bottom: 0;
 }

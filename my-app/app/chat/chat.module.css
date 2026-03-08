@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e6ebff 0%, #fff9f9 50%, #fdfbff 100%);
+  background: var( --bg-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -17,11 +17,11 @@
 
 /* Левая колонка - список чатов */
 .chatsSection {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-secondary);
   backdrop-filter: blur(8px);
   border-radius: 1.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color-chat);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -33,7 +33,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .chatsTitle {
@@ -42,7 +42,7 @@
   gap: 0.5rem;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
 }
 
 .chatsIcon {
@@ -72,7 +72,7 @@
 .chatsSearch {
   position: relative;
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .searchIcon {
@@ -80,7 +80,6 @@
   left: 2rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9CA3AF; 
   width: 1.25rem;
   height: 1.25rem;
 }
@@ -88,9 +87,9 @@
 .searchInput {
   width: 100%;
   padding: 0.625rem 1rem 0.625rem 2.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid var(--border-input);
   border-radius: 1.5rem;
-  background: white;
+  background: var(--bg-card);
   outline: none;
   transition: all 0.2s;
   font-size: 0.875rem;
@@ -103,7 +102,7 @@
 }
 
 .searchInput::placeholder {
-  color: #94A3B8;
+  color: var(--text-muted);
 }
 
 .chatsList {
@@ -121,12 +120,12 @@
 }
 
 .chatsList::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: var(--chat-scrollbar-track);
   border-radius: 4px;
 }
 
 .chatsList::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: var(--chat-scrollbar-thumb);
   border-radius: 4px;
 }
 
@@ -144,7 +143,7 @@
 }
 
 .chatItem:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--chat-item-hover);
 }
 
 .chatItem.active {
@@ -162,7 +161,7 @@
   height: 56px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid white;
+  border: 2px solid var(--bg-card);
 }
 
 .onlineIndicator {
@@ -171,9 +170,9 @@
   right: 2px;
   width: 12px;
   height: 12px;
-  background: #10B981;
+  background: var(--online-indicator);
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid var(--bg-card);
 }
 
 .chatInfo {
@@ -190,13 +189,13 @@
 
 .chatName {
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   font-size: 0.95rem;
 }
 
 .chatTime {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--text-tertiary);
 }
 
 .chatPreview {
@@ -208,7 +207,7 @@
 
 .lastMessage {
   font-size: 0.875rem;
-  color: #6B7280;
+  color: var(--text-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -226,8 +225,8 @@
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  background: #2563EB;
-  color: white;
+  background: var(--unread-badge);
+  color: #E5E7EB;
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 10px;
@@ -238,15 +237,28 @@
 
 /* Правая колонка - переписка */
 .messagesSection {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-secondary);
   backdrop-filter: blur(8px);
   border-radius: 1.5rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color-chat);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   height: 100%;
+}
+
+.messagesSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--bg-image);
+  opacity: var(--opacity-bg-image); 
+  pointer-events: none; 
+  z-index: -1;
 }
 
 .messagesHeader {
@@ -254,7 +266,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  background: var(--chat-header-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .mobileBackButton {
@@ -288,7 +301,7 @@
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid white;
+  border: 2px solid var(--bg-card);
 }
 
 .chatOnlineIndicator {
@@ -297,9 +310,9 @@
   right: 2px;
   width: 10px;
   height: 10px;
-  background: #10B981;
+  background: var(--online-indicator);
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid var(--bg-card);
 }
 
 .chatUserDetails {
@@ -309,13 +322,13 @@
 
 .chatUserName {
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   font-size: 1rem;
 }
 
 .chatUserStatus {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--text-tertiary);
 }
 
 .chatActions {
@@ -332,7 +345,7 @@
   background: transparent;
   border: none;
   border-radius: 0.75rem;
-  color: #4B5563;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 1.25rem;
@@ -348,22 +361,23 @@
   overflow-y: auto;
   padding: 1.5rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   gap: 1rem;
-  padding-bottom: 80px; /* Добавляем отступ снизу для нижней навигации */
+  padding-bottom: 10px;
+  
 }
-
+ 
 .messagesList::-webkit-scrollbar {
   width: 4px;
 }
 
 .messagesList::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: var(--chat-scrollbar-track);
   border-radius: 4px;
 }
 
 .messagesList::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: var(--chat-scrollbar-thumb);
   border-radius: 4px;
 }
 
@@ -372,7 +386,7 @@
   gap: 0.75rem;
   max-width: 70%;
 }
-
+ 
 .myMessage {
   align-self: flex-end;
   flex-direction: row-reverse;
@@ -395,7 +409,7 @@
   flex-direction: column;
   gap: 0.25rem;
 }
-
+ 
 .messageImage {
   margin-bottom: 0.25rem;
   border-radius: 0.75rem;
@@ -418,14 +432,14 @@
 }
 
 .myMessage .messageBubble {
-  background: #2563EB;
+  background: var(--my-message-bg);
   color: white;
   border-bottom-right-radius: 0.25rem;
 }
 
 .theirMessage .messageBubble {
-  background: #fbf7ff;
-  color: #1F2937;
+  background: var(--their-message-bg);
+  color: var(--text-primary);
   border-bottom-left-radius: 0.25rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
@@ -434,12 +448,13 @@
   font-size: 0.95rem;
   line-height: 1.4;
   margin-right: 1.5rem;
+  margin-bottom: 0.15rem;
 }
 
 .messageTime {
   font-size: 0.688rem;
   position: absolute;
-  bottom: 0.01rem;
+  bottom: 0.00001rem;
   right: 0.7rem;
   opacity: 0.7;
   display: flex;
@@ -452,11 +467,13 @@
 }
 
 .theirMessage .messageTime {
-  color: #6B7280;
+  color: var(--text-tertiary);
 }
 
 .messageStatus {
   font-size: 0.75rem;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 /* Форма отправки сообщения */
@@ -465,8 +482,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(229, 231, 235, 0.5);
-  background: rgba(255, 255, 255, 0.5);
+  border-top: 1px solid var(--border-color);
+  background: var(--chat-header-color);
 }
 
 .attachButton,
@@ -502,13 +519,13 @@
 .messageInput {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid var(--border-input);
   border-radius: 1.5rem;
-  background: white;
+  background: var(--bg-card);
   outline: none;
   transition: all 0.2s;
   font-size: 0.95rem;
-  color: #1F2937;
+  color: var(--text-primary);
 }
 
 .messageInput:focus {
@@ -517,7 +534,7 @@
 }
 
 .messageInput::placeholder {
-  color: #94A3B8;
+  color: var(--text-muted);
 }
 
 /* Нет выбранного чата */
@@ -540,12 +557,12 @@
 .noChatTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .noChatText {
-  color: #6B7280;
+  color: var(--text-tertiary);
   font-size: 0.95rem;
 }
 
@@ -585,7 +602,7 @@
 @media (max-width: 768px) {
   .content {
     grid-template-columns: 1fr;
-    padding: 1rem 1rem 5rem 1rem;
+    padding: 1rem;
     height: calc(100vh - 60px);
   }
 
@@ -604,15 +621,16 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 100;
+    z-index: 1000; /* Увеличиваем z-index */
     border-radius: 0;
     display: none;
     height: 100vh;
-    padding-bottom: 60px;
+    padding-bottom: 0; /* Убираем padding-bottom */
   }
 
   .messagesSection.showOnMobile {
     display: flex;
+    flex-direction: column;
   }
 
   .mobileBackButton {
@@ -620,11 +638,13 @@
   }
 
   .chatsList {
-    padding-bottom: 80px; /* Увеличиваем отступ для нижней навигации */
+    padding-bottom: 80px;
   }
 
-  .messagesList {
-    padding-bottom: 80px; /* Увеличиваем отступ для нижней навигации */
+  /* Убираем padding-bottom у messagesList на мобильных при открытом чате */
+  .messagesSection.showOnMobile .messagesList {
+    padding-bottom: 20px;
+    height: calc(100vh - 130px); /* Вычитаем высоту шапки и формы */
   }
 
   .messageWrapper {
@@ -652,12 +672,16 @@
     height: 2rem;
   }
 
+  /* Форма отправки сообщения */
   .messageForm {
     padding: 0.75rem 1rem;
+    background: var(--chat-header-color);
+    border-top: 1px solid var(--border-color);
     position: sticky;
     bottom: 0;
-    background: white;
-    z-index: 10;
+    z-index: 1001;
+    margin-bottom: 0; /* Убираем отступ */
+    width: 100%;
   }
 
   .attachButton,
@@ -665,6 +689,18 @@
   .sendButton {
     width: 2rem;
     height: 2rem;
+  }
+
+  .messageInput {
+    padding: 0.6rem 0.875rem;
+    font-size: 0.9rem;
+  }
+
+  /* Контейнер сообщений */
+  .messagesSection.showOnMobile .messagesList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
   }
 }
 
@@ -695,4 +731,331 @@
   .messageForm {
     padding: 0.5rem;
   }
+}
+
+/* Добавьте эти стили в конец вашего CSS файла */
+/* Контейнер сообщений - исправленная версия */
+.messagesList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-behavior: smooth; /* Плавная прокрутка */
+  overflow-anchor: auto; /* Автоматическое якорение прокрутки */
+}
+
+/* Якорь для прокрутки к последнему сообщению */
+.messagesList > :last-child {
+  scroll-margin-bottom: 20px;
+}
+
+/* Скрываем скроллбар для Chrome/Safari */
+.messagesList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.messagesList::-webkit-scrollbar-track {
+  background: var(--chat-scrollbar-track);
+  border-radius: 4px;
+}
+
+.messagesList::-webkit-scrollbar-thumb {
+  background: var(--chat-scrollbar-thumb);
+  border-radius: 4px;
+}
+
+/* Сообщения - без order и анимаций, которые могут вызвать перерисовку */
+.messageWrapper {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 70%;
+  /* Убираем animation: fadeInUp 0.2s ease-out; */
+  /* Убираем order: 1; */
+  flex-shrink: 0; /* Запрещаем сжатие */
+}
+
+.myMessage {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.theirMessage {
+  align-self: flex-start;
+}
+
+/* Аватар сообщения */
+.messageAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* Контент сообщения */
+.messageContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 100%;
+}
+
+/* Пузырек сообщения */
+.messageBubble {
+  padding: 0.75rem 1rem;
+  border-radius: 1.25rem;
+  position: relative;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.myMessage .messageBubble {
+  background: var(--my-message-bg);
+  color: white;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.theirMessage .messageBubble {
+  background: var(--their-message-bg);
+  color: var(--text-primary);
+  border-bottom-left-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.messageText {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-right: 1.5rem;
+  margin-bottom: 0.15rem;
+  word-break: break-word;
+}
+
+.messageTime {
+  font-size: 0.688rem;
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.7rem;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.myMessage .messageTime {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.theirMessage .messageTime {
+  color: var(--text-tertiary);
+}
+
+.messageStatus {
+  font-size: 0.75rem;
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Нет сообщений */
+.noMessages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-tertiary);
+  font-size: 0.95rem;
+  gap: 0.5rem;
+}
+
+.noMessages p {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.noMessages span {
+  font-size: 0.875rem;
+}
+
+/* Якорь для прокрутки */
+#messages-end-anchor {
+  height: 1px;
+  width: 100%;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .messagesList {
+    padding: 1rem;
+    height: calc(100vh - 130px);
+  }
+
+  .messageWrapper {
+    max-width: 85%;
+  }
+}
+
+.replyPreview {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  padding: 0.25rem 0;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.03);
+  max-width: 100%;
+}
+
+.myMessage .replyPreview {
+  background: var(--bg-card);
+}
+.replyLine {
+  width: 3px;
+  height: 100%;
+  background: #2563EB;
+  border-radius: 3px;
+  align-self: stretch;
+}
+
+.replyContent {
+  flex: 1;
+  overflow: hidden;
+}
+
+.replySender {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #2563EB;
+  display: block;
+  margin-bottom: 0.1rem;
+}
+
+.replyText {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* Контейнер для ответа над формой */
+.replyContainer {
+  padding: 0.5rem 1rem;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.replyToMessage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  border-left: 3px solid #2563EB;
+}
+
+.replyInfo {
+  flex: 1;
+  overflow: hidden;
+}
+
+.replyLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #2563EB;
+  display: block;
+  margin-bottom: 0.1rem;
+}
+
+.replyTextPreview {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.closeReplyButton {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: all 0.2s;
+}
+
+.closeReplyButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+ 
+
+.messageMedia {
+  margin-bottom: 0.5rem;
+}
+
+.mediaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.25rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  max-width: 400px;
+}
+
+.mediaItem {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.mediaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s;
+}
+
+.mediaImage:hover {
+  transform: scale(1.05);
+}
+
+.mediaVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mediaCaption {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  color: var(--text-primary);
+}
+
+/* Для сообщений с медиа */
+.messageBubble:has(.mediaContainer) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.myMessage .messageBubble:has(.mediaContainer) {
+  background: transparent;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.theirMessage .messageBubble:has(.mediaContainer) {
+  background: transparent;
+  border-bottom-left-radius: 0.25rem;
 }

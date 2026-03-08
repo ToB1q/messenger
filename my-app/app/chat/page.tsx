@@ -1,196 +1,126 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '@/app/components/layout/Header';
+import { useRouter } from 'next/navigation';
+import { useChatStore } from '@/app/store/chatStore';
+import { websocketService } from '../lib/websocket/websocket.service';
+import type { ChatListItem, ChatMessageItem, Attachment } from '../lib/api/types';
 import styles from './chat.module.css';
-
-// Типы данных
-interface Chat {
-  id: number;
-  username: string;
-  avatar: string;
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
-  isOnline: boolean;
-  isTyping?: boolean;
-}
-
-interface Message {
-  id: number;
-  chatId: number;
-  sender: string;
-  senderAvatar: string;
-  content: string;
-  time: string;
-  isRead: boolean;
-  isMyMessage: boolean;
-  image?: string;
-}
+import MediaPicker from '@/app/components/MediaPicker';
+import MediaGrid from '@/app/components/MediaGrid';
 
 export default function ChatPage() {
-  const [selectedChat, setSelectedChat] = useState<number | null>(1);
+  const router = useRouter();
+  
+  const {
+    chats,
+    messages,
+    selectedChat,
+    isLoading,
+    error,
+    fetchChats,
+    sendMessage,
+    setSelectedChat,
+    closeWebSocket
+  } = useChatStore();
+
   const [messageInput, setMessageInput] = useState('');
   const [isMobileDialogOpen, setIsMobileDialogOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
-  
-  const [chats, setChats] = useState<Chat[]>([
-    {
-      id: 1,
-      username: 'alex_design',
-      avatar: '/tank.jpg',
-      lastMessage: 'Привет! Как продвигается проект?',
-      lastMessageTime: '12:34',
-      unreadCount: 2,
-      isOnline: true,
-    },
-    {
-      id: 2,
-      username: 'tobi',
-      avatar: '/jdm.jpg',
-      lastMessage: 'Скинул ссылку на конференцию',
-      lastMessageTime: '10:22',
-      unreadCount: 0,
-      isOnline: false,
-      isTyping: true,
-    },
-    {
-      id: 3,
-      username: 'mouse',
-      avatar: '/zzz.jpg',
-      lastMessage: 'Фото с закатом получилось супер!',
-      lastMessageTime: 'вчера',
-      unreadCount: 5,
-      isOnline: true,
-    },
-    {
-      id: 4,
-      username: 'maria_tech',
-      avatar: '/cat.jpg',
-      lastMessage: 'Когда созвон по API?',
-      lastMessageTime: 'вчера',
-      unreadCount: 0,
-      isOnline: false,
-    },
-    {
-      id: 5,
-      username: 'pavel_photo',
-      avatar: '/68dd056ee60f9.jpg',
-      lastMessage: 'Готовь камеру, на выходные отличная погода',
-      lastMessageTime: '20 фев',
-      unreadCount: 0,
-      isOnline: true,
-    },
-    {
-      id: 6,
-      username: 'anna_travel',
-      avatar: '/sakura.jpg',
-      lastMessage: 'Барселона ждёт! ✈️',
-      lastMessageTime: '19 фев',
-      unreadCount: 0,
-      isOnline: false,
-    },
-  ]);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const [replyToMessage, setReplyToMessage] = useState<ChatMessageItem | null>(null);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      chatId: 1,
-      sender: 'alex_design',
-      senderAvatar: '/tank.jpg',
-      content: 'Привет! Как продвигается работа над дизайн-системой?',
-      time: '12:30',
-      isRead: true,
-      isMyMessage: false,
-    },
-    {
-      id: 2,
-      chatId: 1,
-      sender: 'Вы',
-      senderAvatar: '/cat.jpg',
-      content: 'Привет! Почти закончил, осталось пару компонентов',
-      time: '12:32',
-      isRead: true,
-      isMyMessage: true,
-    },
-    {
-      id: 3,
-      chatId: 1,
-      sender: 'alex_design',
-      senderAvatar: '/tank.jpg',
-      content: 'Круто! Сможешь показать на демо сегодня?',
-      time: '12:33',
-      isRead: true,
-      isMyMessage: false,
-    },
-    {
-      id: 4,
-      chatId: 1,
-      sender: 'Вы',
-      senderAvatar: '/cat.jpg',
-      content: 'Да, без проблем. В 16:00 норм?',
-      time: '12:34',
-      isRead: true,
-      isMyMessage: true,
-    },
-    {
-      id: 5,
-      chatId: 2,
-      sender: 'tobi',
-      senderAvatar: '/jdm.jpg',
-      content: 'Привет! Скинул ссылку на конференцию по Next.js',
-      time: '10:20',
-      isRead: true,
-      isMyMessage: false,
-    },
-    {
-      id: 6,
-      chatId: 2,
-      sender: 'tobi',
-      senderAvatar: '/jdm.jpg',
-      content: 'Очень полезный доклад про Server Components',
-      time: '10:21',
-      isRead: true,
-      isMyMessage: false,
-    },
-    {
-      id: 7,
-      chatId: 3,
-      sender: 'mouse',
-      senderAvatar: '/zzz.jpg',
-      content: 'Смотри какое фото получилось! 📸',
-      time: '23:15',
-      isRead: false,
-      isMyMessage: false,
-      image: '/sakura.jpg',
-    },
-    {
-      id: 8,
-      chatId: 3,
-      sender: 'mouse',
-      senderAvatar: '/zzz.jpg',
-      content: 'Закат в горах, ничто не сравнится с этим моментом',
-      time: '23:16',
-      isRead: false,
-      isMyMessage: false,
-    },
-    {
-      id: 9,
-      chatId: 3,
-      sender: 'Вы',
-      senderAvatar: '/cat.jpg',
-      content: 'Вау! Невероятный кадр 🔥',
-      time: '08:45',
-      isRead: true,
-      isMyMessage: true,
-    },
-  ]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesListRef = useRef<HTMLDivElement>(null);
+
+  // Получаем ID текущего пользователя
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+
+  useEffect(() => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        setCurrentUserId(JSON.parse(userStr).id);
+      }
+    } catch (e) {
+      console.error('Failed to parse user', e);
+    }
+  }, []);
+
+  // Форматирование времени для списка чатов
+  const formatChatTime = (dateString: string | null): string => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffDays === 0) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (diffDays === 1) {
+      return 'вчера';
+    }
+    if (diffDays < 7) {
+      return date.toLocaleDateString([], { weekday: 'short' });
+    }
+    return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
+  };
+
+  // Форматирование времени последнего визита
+  const formatLastSeen = (lastSeenAt: string | null): string => {
+    if (!lastSeenAt) return '';
+
+    const lastSeen = new Date(lastSeenAt);
+    const now = new Date();
+    const diffMs = now.getTime() - lastSeen.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'только что';
+    if (diffMins < 60) {
+      if (diffMins === 1) return '1 минуту назад';
+      if (diffMins >= 2 && diffMins <= 4) return `${diffMins} минуты назад`;
+      if (diffMins >= 5 && diffMins <= 20) return `${diffMins} минут назад`;
+      return `${diffMins} минут назад`;
+    }
+    if (diffHours < 24) {
+      if (diffHours === 1) return '1 час назад';
+      if (diffHours >= 2 && diffHours <= 4) return `${diffHours} часа назад`;
+      return `${diffHours} часов назад`;
+    }
+    if (diffDays < 7) {
+      if (diffDays === 1) return 'вчера';
+      if (diffDays === 2) return 'позавчера';
+      return `${diffDays} дня назад`;
+    }
+
+    return lastSeen.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long'
+    });
+  };
+
+  useEffect(() => {
+    fetchChats();
+
+    return () => {
+      if (closeWebSocket) {
+        closeWebSocket();
+      }
+    };
+  }, [fetchChats, closeWebSocket]);
 
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       if (window.innerWidth > 768) {
         setIsMobileDialogOpen(false);
+        document.body.classList.remove('chat-open');
       }
     };
 
@@ -198,72 +128,172 @@ export default function ChatPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const selectedChatData = chats.find(chat => chat.chat_id === selectedChat);
+  const chatMessages = selectedChat ? messages[selectedChat] || [] : [];
+
+  useEffect(() => {
+    if (messagesListRef.current && chatMessages.length > 0) {
+      requestAnimationFrame(() => {
+        if (messagesListRef.current) {
+          messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight;
+        }
+      });
+    }
+  }, [chatMessages, selectedChat]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || !selectedChat) return;
 
-    const newMessage: Message = {
-      id: messages.length + 1,
-      chatId: selectedChat,
-      sender: 'Вы',
-      senderAvatar: '/cat.jpg',
-      content: messageInput,
-      time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-      isRead: false,
-      isMyMessage: true,
-    };
+    console.log('📤 Sending with reply:', replyToMessage);
+    console.log('📤 Reply ID:', replyToMessage?.id);
+    console.log('📤 Reply text:', replyToMessage?.text);
 
-    setMessages([...messages, newMessage]);
+    await sendMessage(selectedChat, messageInput, replyToMessage?.id);
     setMessageInput('');
+    setReplyToMessage(null);
+  };
 
-    // Обновляем последнее сообщение в чате
-    setChats(chats.map(chat => 
-      chat.id === selectedChat 
-        ? { 
-            ...chat, 
-            lastMessage: messageInput, 
-            lastMessageTime: 'только что',
-            unreadCount: 0 
-          } 
-        : chat
-    ));
+  const handleTyping = (isCurrentlyTyping: boolean) => {
+    if (!selectedChat) return;
+
+    if (websocketService.isActive()) {
+      websocketService.sendTyping(selectedChat, isCurrentlyTyping);
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    if (isCurrentlyTyping) {
+      typingTimeoutRef.current = setTimeout(() => {
+        if (websocketService.isActive()) {
+          websocketService.sendTyping(selectedChat, false);
+        }
+      }, 3000);
+    }
   };
 
   const handleChatSelect = (chatId: number) => {
     setSelectedChat(chatId);
     if (windowWidth <= 768) {
       setIsMobileDialogOpen(true);
+      document.body.classList.add('chat-open');
     }
   };
 
   const handleBackToChats = () => {
     setIsMobileDialogOpen(false);
+    document.body.classList.remove('chat-open');
   };
 
-  const selectedChatData = chats.find(chat => chat.id === selectedChat);
-  const chatMessages = messages.filter(msg => msg.chatId === selectedChat);
+  useEffect(() => {
+    if (!selectedChat || !chatMessages.length) return;
+    
+    const handleFocus = () => {
+      const maxId = Math.max(...chatMessages.map(m => m.id));
+      if (maxId) {
+        websocketService.markAsRead(selectedChat, maxId);
+      }
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [selectedChat, chatMessages]);
+
+  const handleReplyClick = (message: ChatMessageItem) => {
+    setReplyToMessage(message);
+    document.getElementById('message-input')?.focus();
+  };
+
+  const handleCancelReply = () => {
+    setReplyToMessage(null);
+  };
+
+  const handleMediaSelect = async (files: File[]) => {
+    if (!selectedChat) return;
+    
+    console.log('📸 Selected files:', files.map(f => f.name));
+    
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    const videoFiles = files.filter(f => f.type.startsWith('video/'));
+    
+    if (imageFiles.length > 0) {
+      const caption = window.prompt('Введите подпись к фото (необязательно):', '') || '';
+      try {
+        await useChatStore.getState().sendMedia(selectedChat, imageFiles, caption, replyToMessage?.id);
+      } catch (error) {
+        console.error('Error sending photos:', error);
+        alert('Ошибка при отправке фото');
+      }
+    }
+    
+    if (videoFiles.length > 0) {
+      alert('Видео пока в разработке');
+    }
+  };
+
+  const formatMessageTime = (dateString: string) => {
+    return dateString && !isNaN(Date.parse(dateString))
+      ? new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  if (isLoading && chats.length === 0) {
+    return (
+      <div className={styles.container}>
+        <Header />
+        <div className={styles.content}>
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+            <p>Загрузка чатов...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <Header />
+        <div className={styles.content}>
+          <div className={styles.errorContainer}>
+            <p className={styles.errorText}>{error}</p>
+            <button
+              className={styles.retryButton}
+              onClick={() => fetchChats()}
+            >
+              Попробовать снова
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <Header />
-      
+
       <div className={styles.content}>
         {/* Левая колонка - список чатов */}
         <div className={`${styles.chatsSection} ${isMobileDialogOpen ? styles.hideOnMobile : ''}`}>
           <div className={styles.chatsHeader}>
-            <h2 className={styles.chatsTitle}>
-              Чаты
-            </h2>
-            <button className={styles.newChatButton}>
-              <img className={styles.chatsIcon} src="/pen.png" alt="" />
+            <h2 className={styles.chatsTitle}>Чаты</h2>
+            <button className={styles.newChatButton} onClick={() => router.push('/search')}>
+              <img className={styles.chatsIcon} src="/pen.png" alt="Новый чат" />
             </button>
           </div>
 
           <div className={styles.chatsSearch}>
-            <img className={styles.searchIcon} src="/search.svg" alt="" />
-            <input 
-              type="text" 
-              className={styles.searchInput} 
+            <img className={styles.searchIcon} src="/search.svg" alt="Поиск" />
+            <input
+              type="text"
+              className={styles.searchInput}
               placeholder="Поиск среди чатов"
             />
           </div>
@@ -271,27 +301,42 @@ export default function ChatPage() {
           <div className={styles.chatsList}>
             {chats.map((chat) => (
               <button
-                key={chat.id}
-                className={`${styles.chatItem} ${selectedChat === chat.id && !isMobileDialogOpen ? styles.active : ''}`}
-                onClick={() => handleChatSelect(chat.id)}
+                key={chat.chat_id}
+                className={`${styles.chatItem} 
+                  ${selectedChat === chat.chat_id && !isMobileDialogOpen ? styles.active : ''}
+                  ${chat.unread_count > 0 && selectedChat !== chat.chat_id ? styles.newMessage : ''}
+                `}
+                onClick={() => handleChatSelect(chat.chat_id)}
               >
                 <div className={styles.chatAvatarWrapper}>
-                  <img className={styles.chatAvatar} src={chat.avatar} alt={chat.username} />
-                  {chat.isOnline && <span className={styles.onlineIndicator} />}
+                  <img
+                    className={styles.chatAvatar}
+                    src={chat.peer_user.avatar_file_id ? `/api/files/${chat.peer_user.avatar_file_id}` : '/default-avatar.png'}
+                    alt={chat.peer_user.full_name || chat.peer_user.username || 'User'}
+                  />
+                  {chat.peer_online && <span className={styles.onlineIndicator} />}
                 </div>
                 <div className={styles.chatInfo}>
                   <div className={styles.chatHeader}>
-                    <span className={styles.chatName}>{chat.username}</span>
-                    <span className={styles.chatTime}>{chat.lastMessageTime}</span>
+                    <span className={styles.chatName}>
+                      {chat.peer_user.full_name || chat.peer_user.username || 'Пользователь'}
+                    </span>
+                    <span className={styles.chatTime}>
+                      {chat.last_message?.created_at ? formatChatTime(chat.last_message.created_at) : ''}
+                    </span>
                   </div>
                   <div className={styles.chatPreview}>
-                    {chat.isTyping ? (
+                    {chat.peer_typing ? (
                       <span className={styles.typingIndicator}>печатает...</span>
                     ) : (
                       <>
-                        <span className={styles.lastMessage}>{chat.lastMessage}</span>
-                        {chat.unreadCount > 0 && (
-                          <span className={styles.unreadBadge}>{chat.unreadCount}</span>
+                        <span className={styles.lastMessage}>
+                          {chat.last_message?.text || 'Нет сообщений'}
+                        </span>
+                        {chat.unread_count > 0 && (
+                          <span className={styles.unreadBadge}>
+                            {chat.unread_count > 99 ? '99+' : chat.unread_count}
+                          </span>
                         )}
                       </>
                     )}
@@ -306,106 +351,191 @@ export default function ChatPage() {
         <div className={`${styles.messagesSection} ${isMobileDialogOpen ? styles.showOnMobile : ''}`}>
           {selectedChatData ? (
             <>
-              {/* Шапка чата */}
               <div className={styles.messagesHeader}>
                 <div className={styles.mobileBackButton} onClick={handleBackToChats}>
-                  <img className={styles.chatsIcon} src="/back.svg" alt="Назад" />
+                  <img className={styles.chatsIcon} src="/back.png" alt="Назад" />
                 </div>
                 <div className={styles.chatUserInfo}>
                   <div className={styles.chatUserAvatarWrapper}>
-                    <img 
-                      className={styles.chatUserAvatar} 
-                      src={selectedChatData.avatar} 
-                      alt={selectedChatData.username} 
+                    <img
+                      className={styles.chatUserAvatar}
+                      src={selectedChatData.peer_user.avatar_file_id ? `/api/files/${selectedChatData.peer_user.avatar_file_id}` : '/default-avatar.png'}
+                      alt={selectedChatData.peer_user.full_name || selectedChatData.peer_user.username || 'User'}
                     />
-                    {selectedChatData.isOnline && <span className={styles.chatOnlineIndicator} />}
+                    {selectedChatData.peer_online && <span className={styles.chatOnlineIndicator} />}
                   </div>
                   <div className={styles.chatUserDetails}>
-                    <span className={styles.chatUserName}>{selectedChatData.username}</span>
+                    <span className={styles.chatUserName}>
+                      {selectedChatData.peer_user.full_name || selectedChatData.peer_user.username || 'Пользователь'}
+                    </span>
                     <span className={styles.chatUserStatus}>
-                      {selectedChatData.isOnline ? 'в сети' : 'был(а) недавно'}
+                      {selectedChatData.peer_typing ? (
+                        <span className={styles.typingStatus}>печатает...</span>
+                      ) : selectedChatData.peer_online ? (
+                        'в сети'
+                      ) : (
+                        `был(а) ${formatLastSeen(selectedChatData.peer_last_seen_at)}`
+                      )}
                     </span>
                   </div>
                 </div>
                 <div className={styles.chatActions}>
                   <button className={styles.chatActionButton}>
-                    <img className={styles.chatsIcon} src="/phoneCall.png" alt="" />
+                    <img className={styles.chatsIcon} src="/phoneCall.png" alt="Звонок" />
                   </button>
                   <button className={styles.chatActionButton}>
-                    <img className={styles.chatsIcon} src="/videoCall.svg" alt="" />
+                    <img className={styles.chatsIcon} src="/videoCall.svg" alt="Видеозвонок" />
                   </button>
                   <button className={styles.chatActionButton}>
-                    <img className={styles.chatsIcon} src="/menuDots.svg" alt="" />
+                    <img className={styles.chatsIcon} src="/menuDots.svg" alt="Меню" />
                   </button>
                 </div>
               </div>
 
-              {/* Сообщения */}
-              <div className={styles.messagesList}>
-                {chatMessages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`${styles.messageWrapper} ${message.isMyMessage ? styles.myMessage : styles.theirMessage}`}
-                  >
-                    {!message.isMyMessage && (
-                      <img 
-                        className={styles.messageAvatar} 
-                        src={message.senderAvatar} 
-                        alt={message.sender} 
-                      />
-                    )}
-                    <div className={styles.messageContent}>
-                      {message.image && (
-                        <div className={styles.messageImage}>
-                          <img src={message.image} alt="attachment" />
-                        </div>
-                      )}
-                      <div className={styles.messageBubble}>
-                        <p className={styles.messageText}>{message.content}</p>
-                        <span className={styles.messageTime}>
-                          {message.time}
-                          {message.isMyMessage && (
-                            <span className={styles.messageStatus}>
-                              {message.isRead ? '✓✓' : '✓'}
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                    </div>
+              <div className={styles.messagesList} ref={messagesListRef}>
+                {chatMessages.length === 0 ? (
+                  <div className={styles.noMessages}>
+                    <p>Нет сообщений</p>
+                    <span>Напишите первое сообщение</span>
                   </div>
-                ))}
+                ) : (
+                  chatMessages.map((message, index) => {
+                    const messageKey = message.id
+                      ? `msg-${message.id}`
+                      : `temp-${message.chat_id}-${message.client_uuid || index}-${Date.now()}`;
+
+                    const messageTime = formatMessageTime(message.created_at);
+                    const isMyMessage = message.sender_user_id === currentUserId;
+
+                    return (
+                      <div
+                        key={messageKey}
+                        className={`${styles.messageWrapper} ${isMyMessage ? styles.myMessage : styles.theirMessage}`}
+                        onClick={() => handleReplyClick(message)}
+                      >
+                        {!isMyMessage && (
+                          <img
+                            className={styles.messageAvatar}
+                            src={selectedChatData?.peer_user.avatar_file_id
+                              ? `/api/files/${selectedChatData.peer_user.avatar_file_id}`
+                              : '/default-avatar.png'
+                            }
+                            alt="avatar"
+                          />
+                        )}
+                        <div className={styles.messageContent}>
+                          {/* Отображение reply, если есть */}
+                          {message.reply_to_message_id && message.reply_to_text && (
+                            <div className={styles.replyPreview}>
+                              <div className={styles.replyLine}></div>
+                              <div className={styles.replyContent}>
+                                <span className={styles.replySender}>
+                                  {isMyMessage ? 'Вы' : selectedChatData?.peer_user.full_name || 'Пользователь'}
+                                </span>
+                                <span className={styles.replyText}>{message.reply_to_text}</span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Медиа сообщение */}
+                          {message.type === 'media' && message.attachments && message.attachments.length > 0 && (
+                            <MediaGrid 
+                              attachments={message.attachments}
+                              caption={message.text}
+                              isMyMessage={isMyMessage}
+                              messageTime={messageTime}
+                              isRead={message.is_read}
+                              onMediaClick={(index) => {
+                                console.log('Open media viewer:', index);
+                              }}
+                            />
+                          )}
+                          
+                          {/* Текстовое сообщение (только если это не медиа или медиа без подписи) */}
+                          {message.type !== 'media' && message.text && (
+                            <div className={styles.messageBubble}>
+                              <p className={styles.messageText}>{message.text}</p>
+                              <span className={styles.messageTime}>
+                                {messageTime}
+                                {isMyMessage && (
+                                  <img
+                                    className={styles.messageStatus}
+                                    src={message.is_read ? '/read.svg' : '/not-read.svg'}
+                                    alt={message.is_read ? 'Прочитано' : 'Отправлено'}
+                                  />
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+                <div ref={messagesEndRef} />
               </div>
 
-              {/* Форма отправки сообщения */}
+              {replyToMessage && (
+                <div className={styles.replyContainer}>
+                  <div className={styles.replyToMessage}>
+                    <div className={styles.replyInfo}>
+                      <span className={styles.replyLabel}>
+                        Ответ для {replyToMessage.sender_user_id === currentUserId ? 'себя' : selectedChatData?.peer_user.full_name}
+                      </span>
+                      <span className={styles.replyTextPreview}>{replyToMessage.text}</span>
+                    </div>
+                    <button className={styles.closeReplyButton} onClick={handleCancelReply}>
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleSendMessage} className={styles.messageForm}>
-                <button type="button" className={styles.attachButton}>
-                  <img className={styles.chatsIcon} src="/clip.png" alt="" />
-                </button>
-                <input
-                  type="text"
-                  className={styles.messageInput}
-                  placeholder="Написать сообщение..."
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                />
                 <button 
                   type="button" 
-                  className={styles.emojiButton}
+                  className={styles.attachButton}
+                  onClick={() => setShowMediaPicker(true)}
                 >
-                  <img className={styles.chatsIcon} src="/emoji.png" alt="" />
+                  <img className={styles.chatsIcon} src="/clip.png" alt="Прикрепить" />
                 </button>
-                <button 
-                  type="submit" 
+                <input
+                  id="message-input"
+                  type="text"
+                  className={styles.messageInput}
+                  placeholder={replyToMessage ? "Введите ответ..." : "Написать сообщение..."}
+                  value={messageInput}
+                  onChange={(e) => {
+                    setMessageInput(e.target.value);
+                    handleTyping(e.target.value.length > 0);
+                  }}
+                  onBlur={() => handleTyping(false)}
+                />
+                <button type="button" className={styles.emojiButton}>
+                  <img className={styles.chatsIcon} src="/emoji.png" alt="Смайлик" />
+                </button>
+                <button
+                  type="submit"
                   className={styles.sendButton}
                   disabled={!messageInput.trim()}
                 >
-                  <img className={styles.chatsIcon} src="/send.png" alt="" />
+                  <img className={styles.chatsIcon} src="/send.png" alt="Отправить" />
                 </button>
               </form>
+
+              {showMediaPicker && (
+                <MediaPicker
+                  onSelect={handleMediaSelect}
+                  onClose={() => setShowMediaPicker(false)}
+                  maxCount={10}
+                />
+              )}
             </>
           ) : (
             <div className={styles.noChatSelected}>
-              <div className={styles.noChatIcon}><img className={styles.chatsIcon} src="/chat.svg" alt="" /></div>
+              <div className={styles.noChatIcon}>
+                <img className={styles.chatsIcon} src="/chat.svg" alt="Чат" />
+              </div>
               <h3 className={styles.noChatTitle}>Выберите чат</h3>
               <p className={styles.noChatText}>Начните общение с друзьями</p>
             </div>

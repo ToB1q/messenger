@@ -252,7 +252,7 @@ export default function FeedPage() {
                   placeholder="Напишите комментарий..."
                 />
                 <button className={styles.commentSendButton}>
-                  <img className={styles.actionIcon} src="/clip.png" alt="" />
+                  <img className={styles.actionIcon} src="/send.png" alt="" />
                 </button>
               </div>
             </article>

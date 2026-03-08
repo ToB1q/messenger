@@ -1,11 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/app/components/layout/Header';
 import styles from './menu.module.css';
+import { useTheme } from '@/app/context/ThemeContext';
+import { api } from '../lib/api/client';
+import { websocketService } from '../lib/websocket/websocket.service';
 
 export default function MenuPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('menu');
+  const { theme, toggleTheme } = useTheme();
+  const [user, setUser] = useState<any>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Загружаем данные пользователя при монтировании
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch (e) {
+        console.error('Failed to parse user data', e);
+      }
+    }
+  }, []);
+
+  // Функция выхода
+  const handleLogout = async () => {
+  try {
+    // Отправляем статус офлайн через WebSocket
+    if (websocketService.isActive()) {
+      // Даем время на отправку
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    await api.logout();
+    router.push('/login');
+  } catch (error) {
+    console.error('Logout error:', error);
+    router.push('/login');
+  }
+};
 
   return (
     <div className={styles.container}>
@@ -21,12 +58,14 @@ export default function MenuPage() {
             </div>
             <div className={styles.profileInfo}>
               <div className={styles.profileName}>
-                <h1 className={styles.name}>ToB1</h1>
+                <h1 className={styles.name}>
+                  {user?.full_name || user?.username || 'ToB1'}
+                </h1>
                 <span className={styles.verifiedBadge}>✔</span>
               </div>
               <div className={styles.profileContact}>
-                <span className={styles.phone}>+7 999 123 45 67</span>
-                <span className={styles.username}>@tobiq</span>
+                <span className={styles.phone}>{user?.email || 'user@example.com'}</span>
+                <span className={styles.username}>@{user?.username || 'username'}</span>
               </div>
             </div>
           </div>
@@ -82,7 +121,6 @@ export default function MenuPage() {
 
         {/* Правая колонка - дополнительные разделы */}
         <div className={styles.menuSection}>
-
           <div className={styles.menuGrid}>
             {/* Настройки */}
             <div className={styles.menuCard}>
@@ -98,6 +136,27 @@ export default function MenuPage() {
                 <button className={styles.menuCardItem}>
                   <span>Конфиденциальность</span>
                   <span className={styles.menuCardArrow}>→</span>
+                </button>
+                <button className={styles.menuCardItem}>
+                  <span>Тема</span>
+                  <div 
+                    className={styles.themeButton}
+                    onClick={toggleTheme}
+                    role="button"  // Добавляем семантическую роль для доступности
+                    tabIndex={0}   // Делаем элемент фокусируемым
+                    aria-label="Переключить тему"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        toggleTheme();
+                      }
+                    }}
+                  >
+                    <img 
+                      src={theme === 'light' ? '/moon.svg' : '/sun.svg'} 
+                      alt={theme === 'light' ? 'Темная тема' : 'Светлая тема'}
+                      className={styles.themeIcon}
+                    />
+                  </div>
                 </button>
                 <button className={styles.menuCardItem}>
                   <span>Язык</span>
@@ -165,9 +224,17 @@ export default function MenuPage() {
                   <span>Приватность</span>
                   <span className={styles.menuCardArrow}>→</span>
                 </button>
-                <button className={`${styles.menuCardItem} ${styles.logoutButton}`}>
-                  <span>Выйти</span>
-                  <span className={styles.menuCardArrow}>→</span>
+                <button 
+                  className={`${styles.menuCardItem} ${styles.logoutButton}`}
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                >
+                  <span>{isLoggingOut ? 'Выход...' : 'Выйти'}</span>
+                  {isLoggingOut ? (
+                    <span className={styles.logoutSpinner}></span>
+                  ) : (
+                    <span className={styles.menuCardArrow}>→</span>
+                  )}
                 </button>
               </div>
             </div>
