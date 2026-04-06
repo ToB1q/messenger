@@ -1,4 +1,40 @@
 // lib/api/types.ts
+
+// Сначала определим возможные типы вложений
+export type AttachmentKind = 'photo' | 'video' | 'voice';
+
+export interface Attachment {
+  id: number;
+  kind: AttachmentKind;  // Используем общий тип
+  sort_order: number;
+  file_id: number;
+  preview_file_id: number | null;
+  width: number | null;  // Может быть null для voice
+  height: number | null; // Может быть null для voice
+  duration_ms: number | null;
+  content_type: string;
+  size_bytes: number;
+  // Поля для голосовых сообщений (опциональные)
+  waveform?: number[];
+  listened_by_peer?: boolean;
+  listened_at?: string | null;
+}
+
+export interface MediaItem {
+  slot: number;
+  kind: AttachmentKind;  // Используем общий тип
+  file_field: string;
+  preview_file_field: string | null;
+  mime_type: string;
+  original_file_name: string;
+  width: number | null;
+  height: number | null;
+  duration_ms: number | null;
+  // Для голосовых сообщений
+  waveform?: number[];
+}
+
+// Остальные интерфейсы остаются без изменений
 export interface DevicePayload {
   device_uuid: string;
   platform: string;
@@ -67,13 +103,13 @@ export interface ChatMessageItem {
   chat_id: number;
   sender_user_id: number;
   client_uuid: string;
-  type: 'text' | 'media';  // Обновлено
+  type: 'text' | 'media';
   text: string;
   created_at: string;
   is_read: boolean;
   reply_to_message_id?: number | null;
   reply_to_text?: string | null;
-  attachments?: Attachment[];  // Добавлено для медиа
+  attachments?: Attachment[];
 }
 
 export interface ChatPeerUser {
@@ -128,31 +164,6 @@ export interface ErrorResponse {
   };
 }
 
-export interface Attachment {
-  id: number;
-  kind: 'photo' | 'video';
-  sort_order: number;
-  file_id: number;
-  preview_file_id: number | null;
-  width: number;
-  height: number;
-  duration_ms: number | null;
-  content_type: string;
-  size_bytes: number;
-}
-
-export interface MediaItem {
-  slot: number;
-  kind: 'photo' | 'video';
-  file_field: string;
-  preview_file_field: string | null;
-  mime_type: string;
-  original_file_name: string;
-  width: number;
-  height: number;
-  duration_ms: number | null;
-}
-
 export interface SendMediaRequest {
   client_uuid: string;
   caption?: string;
@@ -163,4 +174,25 @@ export interface SendMediaRequest {
 export interface SendMediaResponse {
   chat_id: number;
   message: ChatMessageItem;
+}
+
+export type DeleteMode = 'for_me' | 'for_everyone';
+
+export interface DeleteMessageResponse {
+  chat_id: number;
+  message_id: number;
+  mode: DeleteMode;
+  deleted_at: string;
+}
+
+export interface VoiceListenedRequest {
+  attachment_id: number;
+}
+
+export interface VoiceListenedResponse {
+  chat_id: number;
+  message_id: number;
+  attachment_id: number;
+  listener_user_id: number;
+  listened_at: string;
 }

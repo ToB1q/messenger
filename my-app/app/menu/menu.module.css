@@ -14,6 +14,14 @@
   gap: 1.5rem;
 }
 
+.contentSpiner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
 /* Левая колонка - профиль */
 .profileSection {
   background: var(--bg-card);
@@ -39,14 +47,15 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: var(--accent-gradient);
+  background: var(--bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--accent-gradient);
   box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.2);
   overflow: hidden;
   flex-shrink: 0;
+  position: relative; /* Добавляем позиционирование для overlay */
 }
 
 .avatarImage {
@@ -528,4 +537,79 @@
     width: 1.75rem;
     height: 1.75rem;
   }
+}
+
+/* Стили для загрузки аватара */
+.avatarUploadLabel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 2; /* Убедимся, что label поверх аватара */
+}
+
+.avatarInput {
+  display: none;
+}
+
+.avatarUploadOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: white;
+  font-size: 1.5rem;
+  border-radius: 50%; /* Добавляем скругление */
+  z-index: 3; /* Поверх всего */
+}
+
+.profileAvatar {
+  position: relative;
+}
+ 
+.profileAvatar:hover .avatarUploadOverlay {
+  opacity: 1;
+}
+
+.uploadSpinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--text-tertiary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: #2563EB;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }

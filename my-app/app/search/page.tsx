@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/app/components/layout/Header';
+import Avatar from '@/app/components/Avatar';
 import { api } from '../lib/api/client';
 import styles from './search.module.css';
 
@@ -28,7 +29,7 @@ export default function SearchPage() {
     setLoading(true);
     try {
       const response = await api.searchUsers(searchQuery);
-      setUsers(response.users.filter(user => !user.is_self)); // Исключаем себя
+      setUsers(response.users.filter(user => !user.is_self));
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -41,9 +42,7 @@ export default function SearchPage() {
     try {
       const response = await api.createPrivateChat(userId);
       console.log('Chat created:', response);
-      
-      // Перенаправляем в созданный чат
-      router.push(`/chat/${response.chat_id}`);
+      router.push(`/chat`);
     } catch (error) {
       console.error('Error creating chat:', error);
       alert('Ошибка при создании чата');
@@ -58,17 +57,26 @@ export default function SearchPage() {
       
       <div className={styles.content}>
         <div className={styles.searchSection}>
-          <h1 className={styles.title}>Поиск пользователей</h1>
+          <div className={styles.header}>
+            <h1 className={styles.title}>Поиск пользователей</h1>
+            <p className={styles.subtitle}>Найдите собеседника по username</p>
+          </div>
           
           <form onSubmit={handleSearch} className={styles.searchForm}>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="Введите username (минимум 2 символа)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              minLength={2}
-            />
+            <div className={styles.searchInputWrapper}>
+              <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                className={styles.searchInput}
+                placeholder="Введите username..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                minLength={2}
+              />
+            </div>
             <button 
               type="submit" 
               className={styles.searchButton}
@@ -78,30 +86,33 @@ export default function SearchPage() {
             </button>
           </form>
 
+          {loading && (
+            <div className={styles.loadingContainer}>
+              <div className={styles.spinner}></div>
+              <p>Поиск пользователей...</p>
+            </div>
+          )}
+
+          {!loading && users.length === 0 && searchQuery && (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyStateIcon}>🔍</div>
+              <h3 className={styles.emptyStateTitle}>Пользователи не найдены</h3>
+              <p className={styles.emptyStateText}>
+                Попробуйте изменить поисковый запрос
+              </p>
+            </div>
+          )}
+
           <div className={styles.resultsList}>
-            {users.length === 0 && !loading && searchQuery && (
-              <p className={styles.noResults}>Пользователи не найдены</p>
-            )}
-            
             {users.map((user) => (
               <div key={user.user_id} className={styles.userCard}>
                 <div className={styles.userInfo}>
-                  <div className={styles.userAvatar}>
-                    {/* Заглушка аватара с цветом */}
-                    <div style={{ 
-                      backgroundColor: `hsl(${user.user_id * 100 % 360}, 70%, 50%)`,
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontWeight: 'bold'
-                    }}>
-                      {user.full_name?.[0] || user.username[0]}
-                    </div>
-                  </div>
+                  <Avatar
+                    userId={user.user_id}
+                    fullName={user.full_name}
+                    username={user.username}
+                    size="medium"
+                  />
                   <div className={styles.userDetails}>
                     <span className={styles.userName}>
                       {user.full_name || user.username}
@@ -114,7 +125,17 @@ export default function SearchPage() {
                   onClick={() => handleCreateChat(user.user_id)}
                   disabled={creatingChat === user.user_id}
                 >
-                  {creatingChat === user.user_id ? 'Создание...' : 'Написать'}
+                  {creatingChat === user.user_id ? (
+                    <>
+                      <span className={styles.buttonSpinner}></span>
+                      Создание...
+                    </>
+                  ) : (
+                    <>
+                      {/* <img src="/pen.png" alt="" /> */}
+                      Написать
+                    </>
+                  )}
                 </button>
               </div>
             ))}

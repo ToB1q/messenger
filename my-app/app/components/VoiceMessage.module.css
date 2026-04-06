@@ -1,0 +1,129 @@
+/* app/components/VoiceMessage.module.css */
+.voiceMessage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 300px;
+  width: fit-content;
+}
+
+.myMessage {
+  background: var(--my-message-bg);
+}
+
+.theirMessage {
+  background: var(--their-message-bg);
+}
+
+.playButton {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.playButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.playButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.myMessage .playButton {
+  color: white;
+}
+
+.theirMessage .playButton {
+  color: var(--text-primary);
+}
+
+.waveformContainer {
+  flex: 1;
+  min-width: 150px;
+}
+
+.waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+  margin-bottom: 4px;
+}
+
+.waveformBar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 1px;
+  min-width: 2px;
+  transition: background 0.2s;
+}
+
+.waveformBar.played {
+  background: #2563EB;
+}
+
+.myMessage .waveformBar.played {
+  background: white;
+}
+
+.timeInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.timeText {
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.messageMeta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.messageTime {
+  color: inherit;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.statusIcons {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.voiceStatusIcon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.myMessage .timeInfo {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.theirMessage .timeInfo {
+  color: var(--text-tertiary);
+}
+
+.myMessage .voiceStatusIcon {
+  filter: brightness(0) invert(1);
+}

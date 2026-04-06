@@ -1,63 +1,99 @@
 /* app/search/search.module.css */
 .container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background: var(--bg-primary);
 }
 
 .content {
   max-width: 800px;
   margin: 0 auto;
-  padding: 80px 20px 20px;
+  padding: 2rem 1.5rem;
+  padding-top: calc(80px + 2rem);
 }
 
 .searchSection {
-  background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: var(--bg-secondary);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color-chat);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-tertiary);
+  font-size: 1rem;
 }
 
 .searchForm {
   display: flex;
-  gap: 10px;
-  margin-bottom: 30px;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.searchInputWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--text-tertiary);
 }
 
 .searchInput {
-  flex: 1;
-  padding: 12px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.2s;
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem;
+  border: 1px solid var(--border-input);
+  border-radius: 2rem;
+  background: var(--bg-card);
+  outline: none;
+  transition: all 0.2s;
+  font-size: 1rem;
+  color: var(--text-primary);
 }
 
 .searchInput:focus {
-  outline: none;
-  border-color: #0088cc;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
 }
 
 .searchButton {
-  padding: 12px 24px;
-  background-color: #0088cc;
+  padding: 0.875rem 2rem;
+  background: #2563EB;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .searchButton:hover:not(:disabled) {
-  background-color: #006699;
+  background: #1d4ed8;
+  transform: scale(1.05);
 }
 
 .searchButton:disabled {
@@ -65,37 +101,78 @@
   cursor: not-allowed;
 }
 
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-tertiary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: #2563EB;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-tertiary);
+}
+
+.emptyStateIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.emptyStateTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.emptyStateText {
+  color: var(--text-tertiary);
+}
+
 .resultsList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 .userCard {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  transition: all 0.2s;
+  background: var(--bg-card);
 }
 
 .userCard:hover {
-  background-color: #f8f9fa;
+  border-color: #2563EB;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
 }
 
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 15px;
-}
-
-.userAvatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  overflow: hidden;
+  gap: 1rem;
 }
 
 .userDetails {
@@ -104,29 +181,35 @@
 }
 
 .userName {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
 }
 
 .userUsername {
-  font-size: 14px;
-  color: #666;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
 }
 
 .createChatButton {
-  padding: 8px 16px;
-  background-color: #00a884;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: #00a884;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .createChatButton:hover:not(:disabled) {
-  background-color: #008f70;
+  background: #008f70;
+  transform: scale(1.05);
 }
 
 .createChatButton:disabled {
@@ -134,9 +217,52 @@
   cursor: not-allowed;
 }
 
-.noResults {
-  text-align: center;
-  color: #666;
-  padding: 40px;
-  font-size: 16px;
+.buttonIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.buttonSpinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 0.5rem;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 640px) {
+  .content {
+    padding: 1rem;
+    padding-top: calc(70px + 1rem);
+  }
+
+  .searchSection {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .searchForm {
+    flex-direction: column;
+  }
+
+  .searchButton {
+    width: 100%;
+  }
+
+  .userCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .createChatButton {
+    width: 100%;
+    justify-content: center;
+  }
 }

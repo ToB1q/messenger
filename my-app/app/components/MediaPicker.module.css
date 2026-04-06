@@ -10,16 +10,19 @@
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  backdrop-filter: blur(4px);
 }
 
 .modal {
   background: var(--bg-primary);
   border-radius: 1.5rem;
   width: 90%;
-  max-width: 800px;
+  max-width: 700px;
   max-height: 90vh;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -60,20 +63,33 @@
 .content {
   padding: 1.5rem;
   overflow-y: auto;
-  max-height: calc(90vh - 80px);
+  flex: 1;
+}
+
+/* Пустое состояние */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
 }
 
 .selectButton {
-  width: 100%;
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 200px;
   border: 2px dashed var(--border-color);
   border-radius: 1rem;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .selectButton:hover {
@@ -82,10 +98,22 @@
   background: rgba(37, 99, 235, 0.05);
 }
 
+.plusIcon {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.hint {
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+}
+
+/* Сетка превью */
 .previewGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
@@ -110,7 +138,7 @@
   width: 1.5rem;
   height: 1.5rem;
   border: none;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   color: white;
   border-radius: 50%;
   cursor: pointer;
@@ -119,10 +147,17 @@
   justify-content: center;
   font-size: 1rem;
   transition: all 0.2s;
+  z-index: 2;
 }
 
-.removeButton:hover {
-  background: rgba(0, 0, 0, 0.7);
+.removeButton:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.removeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .fileInfo {
@@ -131,20 +166,109 @@
   left: 0;
   right: 0;
   padding: 0.25rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   color: white;
   font-size: 0.7rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  z-index: 1;
 }
 
+/* Кнопка добавления еще */
+.addMoreButton {
+  aspect-ratio: 1;
+  border: 2px dashed var(--border-color);
+  border-radius: 0.75rem;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.addMoreButton:hover:not(:disabled) {
+  border-color: #2563EB;
+  color: #2563EB;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.addMoreButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Поле для подписи */
+.captionInputContainer {
+  margin-bottom: 1.5rem;
+}
+
+.captionInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-input);
+  border-radius: 0.75rem;
+  background: var(--bg-card);
+  outline: none;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.captionInput:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.captionInput::placeholder {
+  color: var(--text-muted);
+}
+
+.captionInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Футер */
 .footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-top: 1rem;
   border-top: 1px solid var(--border-color);
+}
+
+.fileCount {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
 }
 
 .sendButton {
@@ -158,8 +282,49 @@
   transition: all 0.2s;
 }
 
-.sendButton:hover {
+.sendButton:hover:not(:disabled) {
   background: #1d4ed8;
   transform: scale(1.05);
 }
 
+.sendButton:disabled,
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 480px) {
+  .modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .header {
+    padding: 1rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .previewGrid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .cancelButton,
+  .sendButton {
+    flex: 1;
+    text-align: center;
+  }
+}

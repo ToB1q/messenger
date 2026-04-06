@@ -10,7 +10,10 @@ import {
   CreatePrivateChatResponse,
   CreatePrivateChatRequest,
   SendMediaResponse,
-  ErrorResponse
+  ErrorResponse,
+  DeleteMessageResponse,
+  DeleteMode,
+  VoiceListenedResponse
 } from './types';
 
 const API_BASE_URL = 'https://dev5.pinkmoneyx.ru/api/v1';
@@ -401,6 +404,73 @@ async sendMedia(chatId: number, formData: FormData): Promise<SendMediaResponse> 
     websocketService.disconnect();
   }
 }
+
+
+async deleteMessage(chatId: number, messageId: number, mode: DeleteMode = 'for_me'): Promise<DeleteMessageResponse> {
+  console.log(`🗑️ Deleting message ${messageId} from chat ${chatId} with mode: ${mode}`);
+  
+  // Используем правильный DELETE метод с query параметром
+  const response = await fetch(`${API_BASE_URL}/chats/${chatId}/messages/${messageId}?mode=${mode}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${this.getLocalStorage('access_token')}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+  console.log(`📥 Delete response:`, { status: response.status, data });
+
+  if (!response.ok) {
+    if (isErrorResponse(data)) {
+      throw new Error(data.error?.message || 'Failed to delete message');
+    }
+    throw new Error(`HTTP error ${response.status}`);
+  }
+
+  return data as DeleteMessageResponse;
 }
+
+async markVoiceListened(chatId: number, messageId: number, attachmentId: number): Promise<VoiceListenedResponse> {
+  return this.request<VoiceListenedResponse>(`/chats/${chatId}/messages/${messageId}/voice-listened`, {
+    method: 'POST',
+    body: JSON.stringify({ attachment_id: attachmentId }),
+  });
+}
+
+async uploadAvatar(file: File): Promise<UserDto> {
+  const token = this.getLocalStorage('access_token');
+  
+  const formData = new FormData();
+  formData.append('avatar', file);
+
+  console.log('📤 Uploading avatar:', file.name, file.type, file.size);
+
+  const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
+  });
+
+  const data = await response.json();
+  console.log('📥 Avatar upload response:', { status: response.status, data });
+
+  if (!response.ok) {
+    if (isErrorResponse(data)) {
+      throw new Error(data.error?.message || 'Failed to upload avatar');
+    }
+    throw new Error(`HTTP error ${response.status}`);
+  }
+
+  // Обновляем данные пользователя в localStorage
+  this.setLocalStorage('user', JSON.stringify(data));
+  
+  return data as UserDto;
+}
+}
+
+
 
 export const api = new ApiClient();

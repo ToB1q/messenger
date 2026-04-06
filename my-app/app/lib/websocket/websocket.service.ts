@@ -1,7 +1,12 @@
 // lib/websocket/websocket.service.ts
+import type { DeleteMode } from '../api/types';
 export type WebSocketEvent = 
   | { type: 'message.created'; payload: any }
   | { type: 'message.ack'; payload: any }
+  | { type: 'message.deleted'; payload: { chat_id: number; message_id: number } }
+  | { type: 'message.delete.ack'; payload: { request_id: string; chat_id: number; message_id: number } }
+  | { type: 'message.delete.error'; payload: { request_id: string; chat_id: number; message_id: number; error: string } }
+  | { type: 'voice.listened.updated'; payload: { chat_id: number; message_id: number; attachment_id: number; listened_at: string } }
   | { type: 'read.updated'; payload: any }
   | { type: 'read.ack'; payload: any }
   | { type: 'typing.updated'; payload: any }
@@ -21,6 +26,7 @@ class WebSocketService {
   private isConnected = false;
   private shouldReconnect = true;
   private connectionInProgress = false;
+  public pendingDeletes: Map<string, { chatId: number; messageId: number; mode: string }> = new Map();
 
   connect() {
     const token = localStorage.getItem('access_token');
@@ -244,6 +250,74 @@ class WebSocketService {
   isActive(): boolean {
     return this.isConnected && this.ws !== null && this.ws.readyState === WebSocket.OPEN;
   }
+
+  sendDeleteMessage(chatId: number, messageId: number, mode: DeleteMode = 'for_me'): boolean {
+  if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+    console.log('❌ WebSocket not connected');
+    return false;
+  }
+
+  const requestId = crypto.randomUUID();
+  const message = {
+    type: 'message.delete',
+    payload: {
+      request_id: requestId,
+      chat_id: chatId,
+      message_id: messageId,
+      mode: mode
+    }
+  };
+
+  console.log('📤 Sending delete message via WebSocket:', message);
+  
+  try {
+    this.ws.send(JSON.stringify(message));
+    
+    // Сохраняем requestId для отслеживания подтверждения
+    this.pendingDeletes = this.pendingDeletes || new Map();
+    this.pendingDeletes.set(requestId, { chatId, messageId, mode });
+    
+    // Устанавливаем таймаут на случай отсутствия подтверждения
+    setTimeout(() => {
+      if (this.pendingDeletes?.has(requestId)) {
+        console.log('⚠️ Delete confirmation timeout, retrying with REST');
+        this.pendingDeletes.delete(requestId);
+        // Здесь можно вызвать REST fallback
+      }
+    }, 5000);
+    
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending delete message:', error);
+    return false;
+  }
+}
+
+sendVoiceListened(chatId: number, messageId: number, attachmentId: number): boolean {
+  if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+    return false;
+  }
+
+  const message = {
+    type: 'voice.listen.update',
+    payload: {
+      request_id: crypto.randomUUID(),
+      chat_id: chatId,
+      message_id: messageId,
+      attachment_id: attachmentId
+    }
+  };
+
+  console.log('📤 Sending voice listened:', message);
+  
+  try {
+    this.ws.send(JSON.stringify(message));
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending voice listened:', error);
+    return false;
+  }
+}
 }
 
 export const websocketService = new WebSocketService();

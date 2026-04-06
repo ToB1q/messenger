@@ -1059,3 +1059,258 @@
   background: transparent;
   border-bottom-left-radius: 0.25rem;
 }
+
+.messageBubble {
+  padding: 0.75rem 1rem;
+  border-radius: 1.25rem;
+  position: relative;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.messageText {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-right: 0;
+  margin-bottom: 0.15rem;
+  word-break: break-word;
+}
+
+/* Для коротких сообщений - время внутри */
+.messageText.shortMessage {
+  margin-right: 50px; /* Оставляем место для времени */
+  display: inline-block; /* Чтобы текст не растягивался на всю ширину */
+}
+
+.messageTime {
+  font-size: 0.688rem;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+/* Время внутри пузырька (для коротких сообщений) */
+.messageTime.timeInline {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+}
+
+/* Время под пузырьком (для длинных сообщений) */
+.messageTime:not(.timeInline) {
+  margin-top: 0.25rem;
+  justify-content: flex-end;
+}
+
+/* Свои сообщения */
+.myMessage .messageBubble {
+  background: var(--my-message-bg);
+  color: white;
+  border-bottom-right-radius: 0.25rem;
+}
+
+/* Чужие сообщения */
+.theirMessage .messageBubble {
+  background: var(--their-message-bg);
+  color: var(--text-primary);
+  border-bottom-left-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* Время для своих сообщений */
+.myMessage .messageTime {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Время для чужих сообщений */
+.theirMessage .messageTime {
+  color: var(--text-tertiary);
+}
+
+/* Статус сообщения */
+.messageStatus {
+  width: 14px;
+  height: 14px;
+}
+
+/* Для коротких сообщений - выравнивание */
+.myMessage .messageTime.timeInline {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.theirMessage .messageTime.timeInline {
+  color: var(--text-tertiary);
+}
+
+/* Добавьте курсор-pointer для сообщений */
+.messageWrapper {
+  cursor: context-menu; /* Показывает, что доступно контекстное меню */
+  position: relative;
+}
+
+/* Для мобильных устройств можно добавить подсказку */
+@media (max-width: 768px) {
+  .messageWrapper {
+    -webkit-touch-callout: none; /* Отключает стандартное меню на iOS */
+  }
+}
+
+.voiceButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0.75rem;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.voiceButton:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563EB;
+}
+
+.voiceRecorderModal {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.messageForm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--chat-header-color);
+  position: relative;
+}
+
+.attachButton,
+.emojiButton,
+.sendButton,
+.voiceButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0.75rem;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.attachButton:hover,
+.emojiButton:hover,
+.sendButton:hover:not(:disabled),
+.voiceButton:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563EB;
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.messageInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-input);
+  border-radius: 1.5rem;
+  background: var(--bg-card);
+  outline: none;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.messageInput:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.messageInput::placeholder {
+  color: var(--text-muted);
+}
+
+/* Контейнер для VoiceRecorder */
+.voiceRecorderWrapper {
+  flex: 1;
+  min-width: 0;
+  animation: slideIn 0.2s ease;
+}
+
+.voiceRecorderWrapper :global(.voiceRecorder) {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-input);
+  border-radius: 1.5rem;
+}
+
+.voiceRecorderWrapper :global(.recorderHeader) {
+  margin-bottom: 0.5rem;
+}
+
+.voiceRecorderWrapper :global(.waveformContainer) {
+  padding: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .messageForm {
+    padding: 0.75rem 1rem;
+  }
+
+  .attachButton,
+  .emojiButton,
+  .sendButton,
+  .voiceButton {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .messageInput {
+    padding: 0.6rem 0.875rem;
+    font-size: 0.9rem;
+  }
+}

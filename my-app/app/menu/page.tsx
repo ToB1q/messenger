@@ -1,131 +1,310 @@
+// app/menu/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/app/components/layout/Header';
+import Avatar from '@/app/components/Avatar';
+import { api } from '../lib/api/client';
 import styles from './menu.module.css';
 import { useTheme } from '@/app/context/ThemeContext';
-import { api } from '../lib/api/client';
-import { websocketService } from '../lib/websocket/websocket.service';
+
+interface UserData {
+  id: number;
+  email: string;
+  username: string | null;
+  full_name: string | null;
+  avatar_file_id: number | null;
+  avatar_small_file_id: number | null;
+}
 
 export default function MenuPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('menu');
+  const [user, setUser] = useState<UserData | null>(null);
+  const [uploading, setUploading] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const [user, setUser] = useState<any>(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats] = useState({
+    friends: 24,
+    groups: 8,
+    photos: 156
+  });
 
-  // Загружаем данные пользователя при монтировании
-  useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        setUser(JSON.parse(userStr));
-      } catch (e) {
-        console.error('Failed to parse user data', e);
+  // Функция для загрузки данных пользователя
+  const loadUserData = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Сначала пробуем получить из localStorage
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+        console.log('✅ User data loaded from localStorage');
+      } else {
+        // Если нет в localStorage, запрашиваем с сервера
+        console.log('📡 Fetching user data from server...');
+        const userData = await api.getMe();
+        setUser(userData);
+        // Сохраняем в localStorage
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('✅ User data loaded from server');
       }
+    } catch (err: any) {
+      console.error('❌ Error loading user data:', err);
+      setError(err.message || 'Ошибка загрузки данных');
+      
+      // Если ошибка авторизации, перенаправляем на логин
+      if (err.message?.includes('401') || err.message?.includes('unauthorized')) {
+        router.push('/login');
+      }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Загружаем данные при монтировании
+  useEffect(() => {
+    loadUserData();
   }, []);
 
-  // Функция выхода
-  const handleLogout = async () => {
-  try {
-    // Отправляем статус офлайн через WebSocket
-    if (websocketService.isActive()) {
-      // Даем время на отправку
-      await new Promise(resolve => setTimeout(resolve, 100));
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Проверяем размер (макс 5 МБ)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Файл слишком большой. Максимальный размер 5 МБ');
+      return;
     }
-    
-    await api.logout();
-    router.push('/login');
-  } catch (error) {
-    console.error('Logout error:', error);
-    router.push('/login');
+
+    // Проверяем тип файла
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Поддерживаются только JPEG, PNG, WEBP и HEIC');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const updatedUser = await api.uploadAvatar(file);
+      setUser(updatedUser);
+      // Обновляем данные в localStorage
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      alert('Аватар успешно обновлен');
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error);
+      alert(error.message || 'Ошибка при загрузке аватара');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      router.push('/login');
+    }
+  };
+
+  const handleRetry = () => {
+    loadUserData();
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <Header />
+        <div className={styles.contentSpiner}>
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+            <p>Загрузка профиля...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
-};
+
+  if (error || !user) {
+    return (
+      <div className={styles.container}>
+        <Header />
+        <div className={styles.content}>
+          <div className={styles.errorContainer}>
+            <div className={styles.errorIcon}>⚠️</div>
+            <h3 className={styles.errorTitle}>Ошибка загрузки данных</h3>
+            <p className={styles.errorText}>{error || 'Пользователь не найден'}</p>
+            <button 
+              className={styles.retryButton}
+              onClick={handleRetry}
+            >
+              Попробовать снова
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <Header />
       
       <div className={styles.content}>
-        {/* Левая колонка - профиль и основное меню */}
+        {/* Левая колонка - профиль */}
         <div className={styles.profileSection}>
-          {/* Шапка профиля */}
           <div className={styles.profileHeader}>
             <div className={styles.profileAvatar}>
-              <img src="/cat.jpg" alt="Profile" className={styles.avatarImage} />
+              <Avatar
+                userId={user.id}
+                fullName={user.full_name}
+                username={user.username}
+                avatarFileId={user.avatar_file_id}
+                size="large"
+              />
+              <label className={styles.avatarUploadLabel}>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/heic"
+                  onChange={handleAvatarUpload}
+                  disabled={uploading}
+                  className={styles.avatarInput}
+                />
+                <div className={styles.avatarUploadOverlay}>
+                  {uploading ? (
+                    <div className={styles.uploadSpinner}></div>
+                  ) : (
+                    <span className={styles.editIcon}>✎</span>
+                  )}
+                </div>
+              </label>
             </div>
+            
             <div className={styles.profileInfo}>
               <div className={styles.profileName}>
-                <h1 className={styles.name}>
-                  {user?.full_name || user?.username || 'ToB1'}
-                </h1>
-                <span className={styles.verifiedBadge}>✔</span>
+                <h2 className={styles.name}>{user.full_name || user.username}</h2>
+                <span className={styles.verifiedBadge}>✓</span>
               </div>
               <div className={styles.profileContact}>
-                <span className={styles.phone}>{user?.email || 'user@example.com'}</span>
-                <span className={styles.username}>@{user?.username || 'username'}</span>
+                <span className={styles.username}>@{user.username}</span>
+                <span className={styles.phone}>{user.email}</span>
               </div>
             </div>
           </div>
 
-          {/* Кнопка редактирования */}
           <button className={styles.editButton}>
             <span className={styles.editIcon}>✎</span>
             Редактировать профиль
           </button>
 
-          {/* Статистика */}
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
-              <span className={styles.statValue}>142</span>
-              <span className={styles.statLabel}>Сообщений</span>
+              <span className={styles.statValue}>{stats.friends}</span>
+              <span className={styles.statLabel}>Друзья</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statValue}>28</span>
-              <span className={styles.statLabel}>Контактов</span>
+              <span className={styles.statValue}>{stats.groups}</span>
+              <span className={styles.statLabel}>Группы</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statValue}>89</span>
-              <span className={styles.statLabel}>Лайков</span>
+              <span className={styles.statValue}>{stats.photos}</span>
+              <span className={styles.statLabel}>Фото</span>
             </div>
           </div>
 
-          {/* Premium баннер */}
           <div className={styles.premiumBanner}>
             <div className={styles.premiumContent}>
-              <img className={styles.premiumIcon} src="/yellowStar.png" alt="" />
+              <span className={styles.premiumIcon}>⭐</span>
               <div className={styles.premiumText}>
-                <span className={styles.premiumTitle}>Премиум</span>
-                <span className={styles.premiumSubtitle}>Разблокируйте возможности</span>
+                <span className={styles.premiumTitle}>Phoenix Premium</span>
+                <span className={styles.premiumSubtitle}>Больше возможностей</span>
               </div>
             </div>
             <button className={styles.premiumButton}>→</button>
           </div>
 
-          {/* Навигационные пункты */}
           <nav className={styles.navMenu}>
             <button className={styles.navItem}>
-              <img className={styles.navIcon} src="/star.png" alt="" />
-              <span className={styles.navLabel}>Избранное</span>
+              <img src="/star.png" alt="" className={styles.navIcon} />
+              <span className={styles.navLabel}>Избраннок</span>
               <span className={styles.navArrow}>→</span>
             </button>
             <button className={styles.navItem}>
-              <img className={styles.navIcon} src="/phoneCall.png" alt="" />
+              <img src="/phoneCall.png" alt="" className={styles.navIcon} />
               <span className={styles.navLabel}>Звонки</span>
+              <span className={styles.navArrow}>→</span>
+            </button>
+            <button className={`${styles.navItem} ${styles.logoutButton}`} onClick={handleLogout}>
+              <span className={styles.navLabel}>Выйти</span>
               <span className={styles.navArrow}>→</span>
             </button>
           </nav>
         </div>
 
-        {/* Правая колонка - дополнительные разделы */}
+        {/* Правая колонка - меню */}
         <div className={styles.menuSection}>
           <div className={styles.menuGrid}>
-            {/* Настройки */}
+            {/* Карточка чатов */}
             <div className={styles.menuCard}>
               <div className={styles.menuCardHeader}>
-                <img className={styles.menuCardIcon} src="/setting.png" alt="" />
+                <img src={theme === 'light' ? '/chat.svg' : '/chat-dark.svg'} alt="" className={styles.menuCardIcon}/>
+                <h3 className={styles.menuCardTitle}>Чаты</h3>
+              </div>
+              <div className={styles.menuCardItems}>
+                <button className={styles.menuCardItem} onClick={() => router.push('/chat')}>
+                  <span>Все чаты</span>
+                  <span className={styles.menuCardCount}>12</span>
+                </button>
+                <button className={styles.menuCardItem}>
+                  <span>Непрочитанные</span>
+                  <span className={styles.menuCardCount}>3</span>
+                </button>
+                <button className={styles.menuCardItem}>
+                  <span>Закрепленные</span>
+                  <span className={styles.menuCardArrow}>→</span>
+                </button>
+                <button className={styles.menuCardItem}>
+                  <span>Архив</span>
+                  <span className={styles.menuCardArrow}>→</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Карточка медиа */}
+            <div className={styles.menuCard}>
+              <div className={styles.menuCardHeader}>
+                <img src="/media.png" alt="" className={styles.menuCardIcon} />
+                <h3 className={styles.menuCardTitle}>Медиа</h3>
+              </div>
+              <div className={styles.menuCardItems}>
+                <button className={styles.menuCardItem}>
+                  <span>Фото</span>
+                  <span className={styles.menuCardValue}>156</span>
+                </button>
+                <button className={styles.menuCardItem}>
+                  <span>Видео</span>
+                  <span className={styles.menuCardValue}>23</span>
+                </button>
+                <button className={styles.menuCardItem}>
+                  <span>Аудио</span>
+                  <span className={styles.menuCardValue}>45</span>
+                </button>
+                <button className={styles.menuCardItem}>
+                  <span>Файлы</span>
+                  <span className={styles.menuCardValue}>12</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Карточка настроек */}
+            <div className={styles.menuCard}>
+              <div className={styles.menuCardHeader}>
+                <img src="/setting.png" alt="" className={styles.menuCardIcon} />
                 <h3 className={styles.menuCardTitle}>Настройки</h3>
               </div>
               <div className={styles.menuCardItems}>
@@ -138,103 +317,34 @@ export default function MenuPage() {
                   <span className={styles.menuCardArrow}>→</span>
                 </button>
                 <button className={styles.menuCardItem}>
-                  <span>Тема</span>
-                  <div 
-                    className={styles.themeButton}
-                    onClick={toggleTheme}
-                    role="button"  // Добавляем семантическую роль для доступности
-                    tabIndex={0}   // Делаем элемент фокусируемым
-                    aria-label="Переключить тему"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        toggleTheme();
-                      }
-                    }}
-                  >
-                    <img 
-                      src={theme === 'light' ? '/moon.svg' : '/sun.svg'} 
-                      alt={theme === 'light' ? 'Темная тема' : 'Светлая тема'}
-                      className={styles.themeIcon}
-                    />
-                  </div>
-                </button>
-                <button className={styles.menuCardItem}>
                   <span>Язык</span>
                   <span className={styles.menuCardValue}>Русский</span>
                 </button>
-              </div>
-            </div>
-
-            {/* Медиа */}
-            <div className={styles.menuCard}>
-              <div className={styles.menuCardHeader}>
-                <img className={styles.menuCardIcon} src="/media.png" alt="" />
-                <h3 className={styles.menuCardTitle}>Медиа</h3>
-              </div>
-              <div className={styles.menuCardItems}>
                 <button className={styles.menuCardItem}>
-                  <span>Фотографии</span>
-                  <span className={styles.menuCardCount}>24</span>
-                </button>
-                <button className={styles.menuCardItem}>
-                  <span>Видео</span>
-                  <span className={styles.menuCardCount}>12</span>
-                </button>
-                <button className={styles.menuCardItem}>
-                  <span>Файлы</span>
-                  <span className={styles.menuCardCount}>8</span>
+                  <span>Тема</span>
+                  <span className={styles.menuCardValue}>Системная</span>
                 </button>
               </div>
             </div>
 
-            {/* Помощь */}
+            {/* Карточка поддержки */}
             <div className={styles.menuCard}>
               <div className={styles.menuCardHeader}>
-                <img className={styles.menuCardIcon} src="/help.png" alt="" />
-                <h3 className={styles.menuCardTitle}>Помощь</h3>
+                <img src="/help.png" alt="" className={styles.menuCardIcon} />
+                <h3 className={styles.menuCardTitle}>Поддержка</h3>
               </div>
               <div className={styles.menuCardItems}>
                 <button className={styles.menuCardItem}>
-                  <span>FAQ</span>
+                  <span>Помощь</span>
                   <span className={styles.menuCardArrow}>→</span>
                 </button>
                 <button className={styles.menuCardItem}>
-                  <span>Поддержка</span>
+                  <span>Обратная связь</span>
                   <span className={styles.menuCardArrow}>→</span>
                 </button>
                 <button className={styles.menuCardItem}>
                   <span>О приложении</span>
                   <span className={styles.menuCardValue}>v1.0.0</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Аккаунт */}
-            <div className={styles.menuCard}>
-              <div className={styles.menuCardHeader}>
-                <img className={styles.menuCardIcon} src="/userIcon.png" alt="" />
-                <h3 className={styles.menuCardTitle}>Аккаунт</h3>
-              </div>
-              <div className={styles.menuCardItems}>
-                <button className={styles.menuCardItem}>
-                  <span>Безопасность</span>
-                  <span className={styles.menuCardArrow}>→</span>
-                </button>
-                <button className={styles.menuCardItem}>
-                  <span>Приватность</span>
-                  <span className={styles.menuCardArrow}>→</span>
-                </button>
-                <button 
-                  className={`${styles.menuCardItem} ${styles.logoutButton}`}
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                >
-                  <span>{isLoggingOut ? 'Выход...' : 'Выйти'}</span>
-                  {isLoggingOut ? (
-                    <span className={styles.logoutSpinner}></span>
-                  ) : (
-                    <span className={styles.menuCardArrow}>→</span>
-                  )}
                 </button>
               </div>
             </div>

@@ -2,16 +2,11 @@
 'use client';
 
 import { useState } from 'react';
+import type { Attachment } from '../lib/api/types';
 import styles from './MediaGrid.module.css';
 
 interface MediaGridProps {
-  attachments: Array<{
-    id: number;
-    kind: 'photo' | 'video';
-    file_id: number;
-    width?: number;
-    height?: number;
-  }>;
+  attachments: Attachment[];
   caption?: string;
   isMyMessage?: boolean;
   messageTime?: string;
@@ -28,6 +23,11 @@ export default function MediaGrid({
   onMediaClick 
 }: MediaGridProps) {
   const [loaded, setLoaded] = useState<boolean[]>(new Array(attachments.length).fill(false));
+
+  // Фильтруем только фото и видео для сетки (голосовые обрабатываются отдельно)
+  const mediaAttachments = attachments.filter(att => att.kind === 'photo' || att.kind === 'video');
+
+  if (mediaAttachments.length === 0) return null;
 
   const getGridClass = (count: number) => {
     if (count === 1) return styles.grid1;
@@ -57,12 +57,12 @@ export default function MediaGrid({
   };
 
   return (
-    <div className={`${styles.mediaContainer} ${isMyMessage ? styles.myMessage : styles.theirMessage}`}>
-      <div className={`${styles.mediaGrid} ${getGridClass(attachments.length)}`}>
-        {attachments.map((attachment, index) => (
+    <div className={styles.mediaContainer}>
+      <div className={`${styles.mediaGrid} ${getGridClass(mediaAttachments.length)}`}>
+        {mediaAttachments.map((attachment, index) => (
           <div
             key={attachment.id}
-            className={`${styles.gridItem} ${getItemClass(index, attachments.length)}`}
+            className={`${styles.gridItem} ${getItemClass(index, mediaAttachments.length)}`}
             onClick={() => onMediaClick?.(index)}
           >
             {attachment.kind === 'photo' ? (
@@ -89,18 +89,12 @@ export default function MediaGrid({
                 <span>Загрузка...</span>
               </div>
             )}
-            {attachment.kind === 'video' && (
-              <div className={styles.videoBadge}>
-                <span>▶</span>
-              </div>
-            )}
           </div>
         ))}
       </div>
       
-      {/* Если есть подпись, показываем её с временем */}
-      {caption ? (
-        <div className={styles.captionContainer}>
+      {caption && (
+        <div className={`${styles.captionContainer} ${isMyMessage ? styles.myMessage : styles.theirMessage}`}>
           <p className={styles.captionText}>{caption}</p>
           {messageTime && (
             <span className={styles.captionTime}>
@@ -115,21 +109,6 @@ export default function MediaGrid({
             </span>
           )}
         </div>
-      ) : (
-        messageTime && (
-          <div className={styles.timeOverlay}>
-            <span className={styles.timeOverlayText}>
-              {messageTime}
-              {isMyMessage && (
-                <img
-                  className={styles.messageStatus}
-                  src={isRead ? '/read.svg' : '/not-read.svg'}
-                  alt={isRead ? 'Прочитано' : 'Отправлено'}
-                />
-              )}
-            </span>
-          </div>
-        )
       )}
     </div>
   );

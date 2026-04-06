@@ -7,7 +7,8 @@ import type {
   ChatMessageItem,
   ListChatsResponse,
   ChatMessagesResponse,
-  MediaItem
+  MediaItem,
+  DeleteMode
 } from '../lib/api/types';
 
 interface ChatStore {
@@ -18,9 +19,14 @@ interface ChatStore {
   isLoadingMessages: Record<number, boolean>;
   error: string | null;
   replyToMessage: ChatMessageItem | null;
+  deleteConfirmation: {
+    show: boolean;
+    message: ChatMessageItem | null;
+  };
+  
    
   fetchChats: () => Promise<void>;
-  fetchMessages: (chatId: number) => Promise<void>;
+   fetchMessages: (chatId: number, shouldMarkAsRead?: boolean) => Promise<void>;
   sendMessage: (chatId: number, text: string, replyToId?: number | null) => Promise<void>;
   setSelectedChat: (chatId: number | null) => void;
   initWebSocket: () => void;
@@ -31,6 +37,12 @@ interface ChatStore {
   updateChatTyping: (chatId: number, userId: number, isTyping: boolean) => void;
   setReplyToMessage: (message: ChatMessageItem | null) => void;
   sendMedia: (chatId: number, files: File[], caption?: string, replyToId?: number | null) => Promise<void>;
+  checkUserStatusViaAPI: (userId: number) => Promise<void>;
+  deleteMessage: (chatId: number, messageId: number, mode?: DeleteMode) => Promise<void>;
+  showDeleteConfirmation: (message: ChatMessageItem) => void;
+  hideDeleteConfirmation: () => void;
+  sendVoiceMessage: (chatId: number, audioBlob: Blob, duration: number, waveform: number[], replyToId?: number | null) => Promise<void>;
+
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -59,6 +71,70 @@ replyToMessage: null,
     }
     
     switch (event.type) {
+      case 'message.deleted': {
+  console.log('🗑️ Message deleted via WebSocket:', event.payload);
+  const { chat_id, message_id } = event.payload;
+  
+  set((state) => {
+    const currentMessages = state.messages[chat_id] || [];
+    const updatedMessages = currentMessages.filter(msg => msg.id !== message_id);
+    
+    // Обновляем последнее сообщение в чате если нужно
+    let updatedChats = state.chats;
+    if (updatedMessages.length > 0) {
+      const lastMessage = updatedMessages[updatedMessages.length - 1];
+      updatedChats = state.chats.map(chat => 
+        chat.chat_id === chat_id
+          ? { ...chat, last_message: lastMessage }
+          : chat
+      );
+    } else {
+      updatedChats = state.chats.map(chat => 
+        chat.chat_id === chat_id
+          ? { ...chat, last_message: null }
+          : chat
+      );
+    }
+
+    return {
+      messages: {
+        ...state.messages,
+        [chat_id]: updatedMessages
+      },
+      chats: updatedChats
+    };
+  });
+  break;
+}
+
+case 'voice.listened.updated': {
+  console.log('👂 Voice listened updated:', event.payload);
+  const { chat_id, message_id, attachment_id, listened_at } = event.payload;
+  
+  set((state) => {
+    const messages = state.messages[chat_id] || [];
+    const updatedMessages = messages.map(msg => {
+      if (msg.id === message_id && msg.attachments) {
+        const updatedAttachments = msg.attachments.map(att => 
+          att.id === attachment_id 
+            ? { ...att, listened_by_peer: true, listened_at }
+            : att
+        );
+        return { ...msg, attachments: updatedAttachments };
+      }
+      return msg;
+    });
+    
+    return {
+      messages: {
+        ...state.messages,
+        [chat_id]: updatedMessages
+      }
+    };
+  });
+  break;
+}
+
       case 'message.created': {
         const message = event.payload.message;
         console.log('💬 New message created:', message);
@@ -146,11 +222,81 @@ replyToMessage: null,
         }
         break;
 
+        case 'message.delete.ack': {
+  console.log('✅ Message delete acknowledged:', event.payload);
+  const { request_id, chat_id, message_id } = event.payload;
+  
+  // Удаляем из pendingDeletes
+  if (websocketService.pendingDeletes) {
+    websocketService.pendingDeletes.delete(request_id);
+  }
+  
+  // Сообщение уже удалено оптимистично, ничего не делаем
+  break;
+}
+case 'message.delete.error': {
+  console.log('❌ Message delete error:', event.payload);
+  const { request_id, chat_id, message_id, error } = event.payload;
+  
+  // Если сервер вернул ошибку, восстанавливаем сообщение
+  if (request_id) {
+    // Находим сообщение по ID и восстанавливаем его
+    // Для этого нужно где-то хранить удаленные сообщения
+    console.log('Restoring message due to delete error');
+    
+    // Здесь можно добавить логику восстановления
+    // Например, перезагрузить сообщения для этого чата
+    get().fetchMessages(chat_id, false);
+  }
+  break;
+}
+
       case 'read.updated': {
-        console.log('👁️ Read updated:', event.payload);
-        get().updateMessageRead(event.payload.chat_id, event.payload.max_message_id);
-        break;
-      }
+  console.log('👁️ Read updated:', event.payload);
+  const { chat_id, max_message_id, reader_user_id } = event.payload;
+  
+  // Получаем текущего пользователя
+  let currentUserId = 0;
+  try {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      currentUserId = JSON.parse(userStr).id;
+    }
+  } catch (e) {
+    console.error('Failed to parse user', e);
+  }
+
+  // Обновляем статус прочтения для сообщений
+  set((state) => {
+    const currentMessages = state.messages[chat_id] || [];
+    const updatedMessages = currentMessages.map(msg => 
+      msg.id <= max_message_id ? { ...msg, is_read: true } : msg
+    );
+
+    // Обновляем счетчик непрочитанных только если это прочитал другой пользователь
+    const updatedChats = state.chats.map(chat => 
+      chat.chat_id === chat_id
+        ? { 
+            ...chat, 
+            // Обновляем peer_last_read_message_id если это прочитал собеседник
+            peer_last_read_message_id: reader_user_id !== currentUserId 
+              ? max_message_id 
+              : chat.peer_last_read_message_id
+          }
+        : chat
+    );
+
+    return {
+      messages: {
+        ...state.messages,
+        [chat_id]: updatedMessages
+      },
+      chats: updatedChats
+    };
+  });
+  
+  break;
+}
 
       case 'typing.updated': {
         console.log('✏️ Typing updated:', event.payload);
@@ -184,7 +330,139 @@ replyToMessage: null,
 
   console.log('🚀 Connecting WebSocket...');
   websocketService.connect();
+
 },
+deleteConfirmation: {
+  show: false,
+  message: null
+},
+
+showDeleteConfirmation: (message: ChatMessageItem) => {
+  console.log('🗑️ Show delete confirmation for message:', message.id);
+  set({ 
+    deleteConfirmation: { 
+      show: true, 
+      message 
+    } 
+  });
+},
+
+hideDeleteConfirmation: () => {
+  set({ 
+    deleteConfirmation: { 
+      show: false, 
+      message: null 
+    } 
+  });
+},
+
+deleteMessage: async (chatId: number, messageId: number, mode: DeleteMode = 'for_me') => {
+  console.log(`🗑️ Deleting message ${messageId} from chat ${chatId} with mode: ${mode}`);
+  
+  try {
+    let currentUserId = 0;
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        currentUserId = JSON.parse(userStr).id;
+      }
+    } catch (e) {
+      console.error('Failed to parse user', e);
+    }
+
+    const messages = get().messages[chatId] || [];
+    const message = messages.find(m => m.id === messageId);
+    
+    if (!message) {
+      throw new Error('Message not found');
+    }
+
+    if (mode === 'for_everyone' && message.sender_user_id !== currentUserId) {
+      alert('Нельзя удалить чужое сообщение для всех');
+      return;
+    }
+
+    // Сохраняем сообщение для возможного восстановления при ошибке
+    const deletedMessage = { ...message };
+    
+    // Оптимистично удаляем сообщение локально
+    set((state) => {
+      const currentMessages = state.messages[chatId] || [];
+      const updatedMessages = currentMessages.filter(msg => msg.id !== messageId);
+      
+      let updatedChats = state.chats;
+      if (updatedMessages.length > 0) {
+        const lastMessage = updatedMessages[updatedMessages.length - 1];
+        updatedChats = state.chats.map(chat => 
+          chat.chat_id === chatId
+            ? { ...chat, last_message: lastMessage }
+            : chat
+        );
+      } else {
+        updatedChats = state.chats.map(chat => 
+          chat.chat_id === chatId
+            ? { ...chat, last_message: null }
+            : chat
+        );
+      }
+
+      return {
+        messages: {
+          ...state.messages,
+          [chatId]: updatedMessages
+        },
+        chats: updatedChats
+      };
+    });
+
+    get().hideDeleteConfirmation();
+
+    // Отправляем DELETE запрос
+    try {
+      const response = await api.deleteMessage(chatId, messageId, mode);
+      console.log('✅ Message deleted successfully:', response);
+    } catch (error: unknown) {
+      console.error('❌ Error deleting message:', error);
+      
+      // Если ошибка, восстанавливаем сообщение
+      set((state) => {
+        const currentMessages = state.messages[chatId] || [];
+        const updatedMessages = [...currentMessages, deletedMessage].sort((a, b) => 
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        
+        return {
+          messages: {
+            ...state.messages,
+            [chatId]: updatedMessages
+          }
+        };
+      });
+      
+      // Проверяем тип ошибки и показываем соответствующее сообщение
+      if (error instanceof Error) {
+        if (error.message?.includes('403')) {
+          alert('Нет прав на удаление этого сообщения');
+        } else if (error.message?.includes('404')) {
+          alert('Сообщение не найдено');
+        } else {
+          alert('Ошибка при удалении сообщения: ' + error.message);
+        }
+      } else {
+        alert('Ошибка при удалении сообщения');
+      }
+    }
+
+  } catch (error: unknown) {
+    console.error('❌ Error in deleteMessage:', error);
+    if (error instanceof Error) {
+      alert('Ошибка при удалении сообщения: ' + error.message);
+    } else {
+      alert('Ошибка при удалении сообщения');
+    }
+  }
+},
+
 
 sendMedia: async (chatId: number, files: File[], caption: string = '', replyToId?: number | null) => {
   console.log(`📸 Sending media to chat ${chatId}:`, files.length, 'files');
@@ -326,44 +604,48 @@ sendMedia: async (chatId: number, files: File[], caption: string = '', replyToId
     }
   },
 
-  fetchMessages: async (chatId: number) => {
-    console.log(`📥 Fetching messages for chat ${chatId}...`);
+  fetchMessages: async (chatId: number, shouldMarkAsRead: boolean = true) => {
+  console.log(`📥 Fetching messages for chat ${chatId}...`);
+  
+  if (get().isLoadingMessages[chatId]) {
+    console.log('Already loading messages for this chat');
+    return;
+  }
+  
+  set((state) => ({ 
+    isLoadingMessages: { ...state.isLoadingMessages, [chatId]: true },
+    error: null 
+  }));
+  
+  try {
+    const response = await api.getMessages(chatId) as ChatMessagesResponse;
+    console.log(`📥 Messages fetched for chat ${chatId}:`, response.messages.length);
     
-    if (get().isLoadingMessages[chatId]) {
-      console.log('Already loading messages for this chat');
-      return;
-    }
-    
-    set((state) => ({ 
-      isLoadingMessages: { ...state.isLoadingMessages, [chatId]: true },
-      error: null 
+    set((state) => ({
+      messages: {
+        ...state.messages,
+        [chatId]: response.messages
+      },
+      isLoadingMessages: { ...state.isLoadingMessages, [chatId]: false }
     }));
     
-    try {
-      const response = await api.getMessages(chatId) as ChatMessagesResponse;
-      console.log(`📥 Messages fetched for chat ${chatId}:`, response.messages.length);
-      
-      set((state) => ({
-        messages: {
-          ...state.messages,
-          [chatId]: response.messages
-        },
-        isLoadingMessages: { ...state.isLoadingMessages, [chatId]: false }
-      }));
-      
-      if (response.messages.length > 0) {
-        const maxId = Math.max(...response.messages.map(m => m.id));
+    // Отмечаем как прочитанные ТОЛЬКО если чат выбран И пользователь на странице
+    if (shouldMarkAsRead && get().selectedChat === chatId && document.visibilityState === 'visible') {
+      const maxId = Math.max(...response.messages.map(m => m.id));
+      if (maxId) {
         console.log(`👁️ Marking messages as read up to ${maxId}`);
         websocketService.markAsRead(chatId, maxId);
       }
-    } catch (error: any) {
-      console.error(`❌ Error fetching messages for chat ${chatId}:`, error);
-      set((state) => ({ 
-        error: error.message, 
-        isLoadingMessages: { ...state.isLoadingMessages, [chatId]: false }
-      }));
     }
-  },
+  } catch (error: any) {
+    console.error(`❌ Error fetching messages for chat ${chatId}:`, error);
+    set((state) => ({ 
+      error: error.message, 
+      isLoadingMessages: { ...state.isLoadingMessages, [chatId]: false }
+    }));
+  }
+},
+
 
   sendMessage: async (chatId: number, text: string, replyToId?: number | null) => {
   console.log(`📤 Sending message to chat ${chatId}:`, text, replyToId ? `(reply to ${replyToId})` : '');
@@ -552,24 +834,230 @@ sendMedia: async (chatId: number, files: File[], caption: string = '', replyToId
       return { chats: updatedChats };
     });
   },
+
+  checkUserStatusViaAPI: async (userId: number) => {
+  console.log(`🌐 Checking user ${userId} status via API`);
+  try {
+    const response = await api.getChats() as ListChatsResponse;
+    const updatedChat = response.chats.find(c => c.peer_user.user_id === userId);
+    
+    if (updatedChat) {
+      set((state) => ({
+        chats: state.chats.map(chat => 
+          chat.peer_user.user_id === userId
+            ? { 
+                ...chat, 
+                peer_online: updatedChat.peer_online,
+                peer_last_seen_at: updatedChat.peer_last_seen_at 
+              }
+            : chat
+        )
+      }));
+    }
+  } catch (error) {
+    console.error('❌ Error checking user status:', error);
+  }
+},
  
   setSelectedChat: (chatId: number | null) => {
-    console.log(`🎯 Selected chat changed to:`, chatId);
-    set({ selectedChat: chatId });
-    
-    if (chatId) {
-      const currentMessages = get().messages[chatId];
-      if (!currentMessages || currentMessages.length === 0) {
-        get().fetchMessages(chatId);
-      } else {
-        // Отмечаем сообщения как прочитанные при открытии чата
-        const maxId = Math.max(...currentMessages.map(m => m.id));
-        if (maxId) {
-          websocketService.markAsRead(chatId, maxId);
-        }
+  console.log(`🎯 Selected chat changed to:`, chatId);
+  set({ selectedChat: chatId });
+  
+  if (chatId) {
+    const currentMessages = get().messages[chatId];
+    if (!currentMessages || currentMessages.length === 0) {
+      // При первом открытии не отмечаем как прочитанные автоматически
+      get().fetchMessages(chatId, false);
+    } else {
+      // Если сообщения уже загружены, отмечаем как прочитанные только если чат активен
+      const maxId = Math.max(...currentMessages.map(m => m.id));
+      if (maxId && document.visibilityState === 'visible') {
+        console.log(`👁️ Marking messages as read up to ${maxId}`);
+        websocketService.markAsRead(chatId, maxId);
+        
+        // Обновляем локальный статус
+        set((state) => ({
+          messages: {
+            ...state.messages,
+            [chatId]: state.messages[chatId].map(msg => ({ ...msg, is_read: true }))
+          },
+          chats: state.chats.map(chat => 
+            chat.chat_id === chatId
+              ? { ...chat, unread_count: 0 }
+              : chat
+          )
+        }));
       }
     }
-  },
+    
+    const selectedChat = get().chats.find(c => c.chat_id === chatId);
+    if (selectedChat) {
+      get().checkUserStatusViaAPI(selectedChat.peer_user.user_id);
+    }
+  }
+},
+
+sendVoiceMessage: async (chatId: number, audioBlob: Blob, duration: number, waveform: number[], replyToId?: number | null) => {
+  console.log(`🎤 Sending voice message to chat ${chatId}, duration: ${duration}s, blob type: ${audioBlob.type}`);
+  
+  try {
+    let currentUserId = 0;
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        currentUserId = JSON.parse(userStr).id;
+      }
+    } catch (e) {
+      console.error('Failed to parse user', e);
+    }
+
+    const clientUuid = crypto.randomUUID();
+
+    let replyToText = null;
+    if (replyToId) {
+      const replyMessage = get().replyToMessage;
+      replyToText = replyMessage?.text || null;
+    }
+
+    // СОЗДАЕМ ВРЕМЕННОЕ СООБЩЕНИЕ
+    const tempMessage: ChatMessageItem = {
+      id: Date.now(),
+      chat_id: chatId,
+      sender_user_id: currentUserId,
+      text: '',
+      created_at: new Date().toISOString(),
+      is_read: false,
+      client_uuid: clientUuid,
+      type: 'media',
+      reply_to_message_id: replyToId || null,
+      reply_to_text: replyToText,
+      attachments: [{
+        id: Date.now(),
+        kind: 'voice',
+        sort_order: 0,
+        file_id: 0,
+        preview_file_id: null,
+        width: null,
+        height: null,
+        duration_ms: duration * 1000,
+        content_type: audioBlob.type,
+        size_bytes: audioBlob.size,
+        waveform: waveform,
+        listened_by_peer: false
+      }]
+    };
+
+    get().addMessage(chatId, tempMessage);
+    
+    if (replyToId) {
+      set({ replyToMessage: null });
+    }
+
+    // Создаем FormData
+    const formData = new FormData();
+    formData.append('client_uuid', clientUuid);
+    
+    if (replyToId) {
+      formData.append('reply_to_message_id', replyToId.toString());
+    }
+
+    // Определяем правильное расширение файла на основе MIME типа
+    let fileExtension = 'm4a';
+    let mimeType = audioBlob.type;
+    
+    if (audioBlob.type.includes('mp4')) {
+      fileExtension = 'm4a';
+      mimeType = 'audio/mp4';
+    } else if (audioBlob.type.includes('aac')) {
+      fileExtension = 'aac';
+      mimeType = 'audio/aac';
+    } else if (audioBlob.type.includes('m4a')) {
+      fileExtension = 'm4a';
+      mimeType = 'audio/m4a';
+    } else {
+      // Если тип не поддерживается, пробуем конвертировать или используем audio/mp4
+      console.warn('Unsupported mime type, using audio/mp4');
+      mimeType = 'audio/mp4';
+      fileExtension = 'm4a';
+    }
+
+    const fileName = `voice_${Date.now()}.${fileExtension}`;
+    
+    // Создаем новый файл с правильным MIME типом
+    const audioFile = new File([audioBlob], fileName, { type: mimeType });
+    formData.append('media_0', audioFile);
+
+    // Создаем items для голосового сообщения
+    const items = [{
+      slot: 0,
+      kind: 'voice' as const,
+      file_field: 'media_0',
+      preview_file_field: null,
+      mime_type: mimeType,
+      original_file_name: fileName,
+      width: null,
+      height: null,
+      duration_ms: duration * 1000,
+      waveform: waveform
+    }];
+
+    formData.append('items', JSON.stringify(items));
+    console.log('📤 Sending voice message with items:', JSON.stringify(items, null, 2));
+
+    const token = localStorage.getItem('access_token');
+
+    const response = await fetch(`https://dev5.pinkmoneyx.ru/api/v1/chats/${chatId}/messages/media`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    const responseText = await response.text();
+    console.log('📥 Voice response:', response.status, responseText);
+
+    if (!response.ok) {
+      // Если ошибка, удаляем временное сообщение
+      set((state) => {
+        const currentMessages = state.messages[chatId] || [];
+        const updatedMessages = currentMessages.filter(msg => msg.client_uuid !== clientUuid);
+        
+        return {
+          messages: {
+            ...state.messages,
+            [chatId]: updatedMessages
+          }
+        };
+      });
+      throw new Error(`HTTP ${response.status}: ${responseText}`);
+    }
+
+    const data = JSON.parse(responseText);
+    console.log('✅ Voice sent successfully:', data);
+    
+    // Заменяем временное сообщение на реальное
+    set((state) => {
+      const currentMessages = state.messages[chatId] || [];
+      const updatedMessages = currentMessages.map(msg => 
+        msg.client_uuid === clientUuid ? data.message : msg
+      );
+      
+      return {
+        messages: {
+          ...state.messages,
+          [chatId]: updatedMessages
+        }
+      };
+    });
+    
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Error sending voice message:', error);
+    throw error;
+  }
+},
 
   setReplyToMessage: (message: ChatMessageItem | null) => {
   console.log('📝 Setting reply message:', message);

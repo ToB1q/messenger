@@ -1,0 +1,68 @@
+/* app/components/ContextMenu.module.css */
+.contextMenu {
+  position: fixed;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 6px 0;
+  min-width: 200px;
+  z-index: 10000;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.1s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: var(--text-primary);
+}
+
+.menuItem:hover {
+  background: var(--bg-secondary);
+}
+
+.menuIcon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+}
+
+.menuText {
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 6px 0;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .contextMenu {
+    position: fixed;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto;
+    bottom: 10px;
+    top: auto !important;
+    transform: none;
+  }
+}
